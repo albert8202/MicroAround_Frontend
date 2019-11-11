@@ -42,12 +42,12 @@ export default {
     p_follow_info:{type:Object,default:null}
   },
   methods: {
-    get_info: function(user_id) {
-      console.log(user_id)
+    get_info: function(userId) {
+      console.log(userId)
       this.getUserPublicInfo(user_id).then(Response => {
         if (Response.data.message == "success") {
           this.load_info(Response.data.data);
-          console.log("user_id:"+user_id);
+          console.log("user_id:"+userId);
           console.log(Response.data);
         }
       });
@@ -58,9 +58,9 @@ export default {
     },
     load_follow_info(info){
       console.log("followInfo", info)
-      this.user_info.user_id=info.user_id;
-      this.user_info.nickname=info.user_nickname;
-      this.user_info.avatar_url=info.avatar_url;
+      this.user_info.user_id=info.userId;
+      this.user_info.nickname=info.userNickname;
+      this.user_info.avatar_url=info.avatarUrl;
     }
   },
   mounted(){
@@ -103,7 +103,7 @@ export default {
     margin-bottom: 10px;
     margin-left: 0px;
     width: 300px;
-    
+
   }
   .user-inner-container{
     width: 90%;

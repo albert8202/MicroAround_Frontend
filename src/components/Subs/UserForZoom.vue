@@ -74,8 +74,8 @@ export default {
     },
     load_follow_info(info) {
       console.log(info);
-      this.user_info.user_id = info.user_id;
-      this.user_info.nickname = info.nickName;
+      this.user_info.user_id = info.userId;
+      this.user_info.nickname = info.userNickName;
       this.user_info.avatar_url = info.avatarUrl;
     },
     change_follow(val){
@@ -110,7 +110,7 @@ export default {
       this.load_follow_info(nval);
     },
     isFollowing(nval,oval){
-      
+
     }
   }
 };

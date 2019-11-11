@@ -81,7 +81,7 @@ export default {
         }
         this.signIn(data).then(Response=>{
           console.log(Response);
-          if(Response.data.code==200 && Response.data.message=="Sign in success")
+          if(Response.data.code==200 && Response.data.message=="success")
           {
             this.checkLogin().then(Response=>{
               console.log('aa',Response)
@@ -93,7 +93,7 @@ export default {
               title: 'Login Success!',
               desc:''
             })
-            var i = Response.data.data.user_id
+            var i = Response.data.data.userID
             //User.userID = i;
             //console.log(User.userID)
             //加入coockie

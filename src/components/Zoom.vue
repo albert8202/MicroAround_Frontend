@@ -110,7 +110,7 @@
 #middle-right-top-container {
   height: 81px;
   background-color: white;
-  
+
 }
 
 /* #follow-button-container {
@@ -148,7 +148,7 @@
   height: 100%;
   position: relative;
   width: 25%;
-  border-radius:0;  
+  border-radius:0;
   border-bottom:1px solid blue;
 }
 .TabItem-three {
@@ -168,7 +168,7 @@
   height: 100%;
   position: relative;
   width: 33%;
-  border-radius:0;  
+  border-radius:0;
   border-bottom:1px solid blue;
 }
 
@@ -335,7 +335,7 @@ bottom:0;
         </div>
 <hr />
         <div id="display-container">
-          
+
 
           <!--display tweets-->
           <div v-if="navStatus.tweetsShow" id="tweets-container">
@@ -467,7 +467,7 @@ export default {
     UserMessage
   },
   created() {
-    
+
     this.visitor = Number(this.$route.query.visitor_id);
     this.user = this.getCookies("userID");
     console.log("user", this.user);
@@ -475,15 +475,15 @@ export default {
       var _this = this;
       this.getUserPublicInfo(this.visitor).then(response => {
         _this.user_info = response.data.data;
-        _this.nickname = response.data.data.nickname;
+        _this.nickname = response.data.data.userNickname;
         console.log(this.nickname);
-        _this.avatar = response.data.data.avatar_url;
-        _this.postsCount = response.data.data.messages_num;
-        _this.followerCount = response.data.data.followers_num;
-        _this.followingCount = response.data.data.follows_num;
-        _this.collectCount = response.data.data.collection_num;
-        _this.selfIntroduction = response.data.data.self_introction;
-        _this.joinTime = response.data.data.register_time;
+        _this.avatar = response.data.data.avatarUrl;
+        _this.postsCount = response.data.data.userMessagesNum;
+        _this.followerCount = response.data.data.userFollowersNum;
+        _this.followingCount = response.data.data.userFollowsNum;
+        _this.collectCount = response.data.data.userCollectionsNum;
+        _this.selfIntroduction = response.data.data.userSelfIntroduction;
+        _this.joinTime = response.data.data.userRegisterTime;
       });
       var p1 = this.if_following_by_me(this.visitor);
       var p2 = this.queryFollowingFor(this.visitor, 1, 10);
@@ -582,7 +582,7 @@ export default {
           break;
         }
       }
-      
+
       if (this.$refs.twe1) {
         this.$refs.twe1.change_follow2(event[0], event[1]);
       }
@@ -648,7 +648,7 @@ export default {
       if (this.$refs.twe2) {
         this.$refs.twe2.change_follow2(val, this.visitor);
       }*/
-      
+
     }
   },
   beforeRouteEnter(to,from,next){
