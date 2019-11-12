@@ -62,6 +62,9 @@ function get(url) {
 }
 
 function createResData(data) {
+  if(!res_data){
+    return null;
+  }
   var result = new Object();
   result.code = data.code;
   result.message = data.message;
@@ -70,6 +73,9 @@ function createResData(data) {
 }
 
 function transformUserPublicInfo(res_data) {
+  if(!res_data){
+    return null;
+  }
   var data = new Object();
   data.user_id = res_data.userId;
   data.nickname = res_data.userNickname
@@ -84,41 +90,77 @@ function transformUserPublicInfo(res_data) {
 }
 
 function transformUserPrivateInfo(res_data) {
+  if(!res_data){
+    return null;
+  }
   var data = new Object();
   data.user_id = res_data.userId;
   data.user_email = res_data.userEmail
   data.user_gender = (res_data.userGender) ? res_data.userGender : null
   data.user_password = res_data.userPassword
   data.user_realname = (res_data.userRealName) ? res_data.userRealName : null
-  
+
   return data
 }
 
-function transformMessage(res_data){
-  var data=new Object();
-  data.message_id=res_data.messageId
-  data.message_content=res_data.messageContent
-  data.message_create_time=res_data.messageCreateTime
-  data.message_like_num=res_data.
-  data.message_transpond_num
-  data.message_comment_num=res_data.messageCommentNum
-  data.message_view_num=res_data.messageViewNum
-  data.message_has_image=res_data.messageHasImage
-  data.message_sender_user_id=null
-  data.message_heat=res_data.messageHeat
-  data.message_image_count=null;
-  data.message_transpond_message_id=null;
-  data.message_topics=res_data.messageTopics;
-  data.message_ats=res_data.messageAts;
-  data.message_image_urls=new Array();
+function transformMessage(res_data) {
+  if(!res_data){
+    return null;
+  }
+  var data = new Object();
+  data.message_id = res_data.messageId
+  data.message_content = res_data.messageContent
+  data.message_create_time = res_data.messageCreateTime
+  data.message_like_num = res_data.messageAgreeNum
+  data.message_transpond_num=null
+  data.message_comment_num = res_data.messageCommentNum
+  data.message_view_num = res_data.messageViewNum
+  data.message_has_image = res_data.messageHasImage
+  data.message_sender_user_id = null
+  data.message_heat = res_data.messageHeat
+  data.message_image_count = null;
+  data.message_transpond_message_id = null;
+  data.message_topics = res_data.messageTopics;
+  data.message_ats = res_data.messageAts;
+  data.message_image_urls = new Array();
   return data
 }
 
-function transformTopic(res_data){
-  var data=new Object()
-  data.topic_id=res_data.topicId
-  data.topic_heat=res_data.topicHeat
-  data.topic_content=res_data.topicContent
+function transformTopic(res_data) {
+  if(!res_data){
+    return null;
+  }
+  var data = new Object()
+  data.topic_id = res_data.topicId
+  data.topic_heat = res_data.topicHeat
+  data.topic_content = res_data.topicContent
+  return data;
+}
+
+function transfromPrivateLetter(res_data) {
+  if(!res_data){
+    return null;
+  }
+  var data = new Object()
+  data.private_letter_id = res_data.privateLetterId
+  data.sender_user_id = res_data.privateLetterSenderId
+  data.private_letter_content = res_data.privateLetterContent
+  data.timeStamp = res_data.privateLetterCreateTime
+  data.sender_info = transformUserPublicInfo(res_data.senderInfo)
+  return data;
+}
+
+function transformComment(res_data){
+  if(!res_data){
+    return null;
+  }
+  var data = new Object();
+  data.comment_id=res_data.commentId
+  data.comment_content=res_data.commentContent
+  data.comment_is_read=res_data.commentIsRead
+  data.comment_sender_id=res_data.commentSenderId
+  data.comment_message_id=res_data.commentMessageId
+  data.comment_create_time=res_data.commentCreateTime
   return data;
 }
 
@@ -128,7 +170,6 @@ Vue.prototype.checkLogin = function () {
   return get("api/user/checkIfSignUp").then(res => {
     var result = createResData(res.data);
     result.data = new Object();
-    console.log(1111, res.data)
     if (res.data.code == 200) {
       result.message = "Aready login"
     } else {
@@ -146,8 +187,10 @@ Vue.prototype.getUserPublicInfo = function (user_id) {
   }
   return get("api/user/getUserPublicInfo/" + user_id).then(res => {
     var result = createResData(res.data);
-    var res_data = res.data.data;
-    result.data = transformUserPublicInfo(res_data);
+    if (res.data.data) {
+      var res_data = res.data.data;
+      result.data = transformUserPublicInfo(res_data);
+    }
     res.data = result;
     return Promise.resolve(res);
   });
@@ -256,31 +299,31 @@ Vue.prototype.search = function (searchKey, startFrom, limitation) {
   if (!checkString(searchKey)) {
     return null;
   }
-  return post("api/search/" + searchKey, data).then(res=>{
-    var data=new Object();
-    var result=createResData(res.data)
-    var message_infos=res.data.data[0]
-    var messages=new Array()
-    for(var i of message_infos){
+  return post("api/search/" + searchKey, data).then(res => {
+    var data = new Object();
+    var result = createResData(res.data)
+    var message_infos = res.data.data[0]
+    var messages = new Array()
+    for (var i of message_infos) {
       messages.push(transformMessage(i));
     }
 
-    var user_infos=res.data.data[1]
-    var users=new Array()
-    for(var i of user_infos){
+    var user_infos = res.data.data[1]
+    var users = new Array()
+    for (var i of user_infos) {
       users.push(transformUserPublicInfo(i))
     }
 
-    var topic_infos=res.data.data[2]
-    var topics=new Array()
-    for(var i of topic_infos){
+    var topic_infos = res.data.data[2]
+    var topics = new Array()
+    for (var i of topic_infos) {
       topics.push(transformTopic(i));
     }
-    data.twitters=messages;
-    data.users=users;
-    data.topics=topics;
-    result.data=data;
-    res.data=result;
+    data.twitters = messages;
+    data.users = users;
+    data.topics = topics;
+    result.data = data;
+    res.data = result;
     return Promise.resolve(res)
   });
 }
@@ -297,15 +340,15 @@ Vue.prototype.queryMessagesContains = function (topic_id, startFrom, limitation)
     startFrom: startFrom,
     limitation: limitation
   }
-  return post("api/topic/queryMessagesByTopic/" + topic_id, data).then(res=>{
-    var message_infos=res.data.data
-    var result=createResData(res.data)
-    var messages=new Array()
-    for(var i of message_infos){
+  return post("api/topic/queryMessagesByTopic/" + topic_id, data).then(res => {
+    var message_infos = res.data.data
+    var result = createResData(res.data)
+    var messages = new Array()
+    for (var i of message_infos) {
       messages.push(transformMessage(i))
     }
-    result.data=messages
-    res.data=result
+    result.data = messages
+    res.data = result
     return Promise.resolve(res)
   });
 }
@@ -316,15 +359,15 @@ Vue.prototype.queryTopicsBaseOnHeat = function (startFrom, limitation) {
     startFrom: startFrom,
     limitation: limitation
   }
-  return post("api/topic/queryTopicsBaseOnHeat", data).then(res=>{
-    var topic_infos=res.data.data
-    var result=createResData(res.data)
-    var topics=new Array()
-    for(var i of topic_infos){
+  return post("api/topic/queryTopicsBaseOnHeat", data).then(res => {
+    var topic_infos = res.data.data
+    var result = createResData(res.data)
+    var topics = new Array()
+    for (var i of topic_infos) {
       topics.push(transformTopic(i))
     }
-    result.data=topics
-    res.data=result
+    result.data = topics
+    res.data = result
     return Promise.resolve(res)
   });
 }
@@ -349,15 +392,15 @@ Vue.prototype.queryFollowingFor = function (user_id, startFrom, limitation) {
     startFrom: startFrom,
     limitation: limitation
   }
-  return post(RELATION + "queryFollowingFor/" + user_id, data).then(res=>{
-    var user_infos=res.data.data
-    var result=createResData(res.data)
-    var users=new Array()
-    for(var i of user_infos){
+  return post(RELATION + "queryFollowingFor/" + user_id, data).then(res => {
+    var user_infos = res.data.data
+    var result = createResData(res.data)
+    var users = new Array()
+    for (var i of user_infos) {
       users.push(transformUserPublicInfo(i))
     }
-    result.data=users
-    res.data=result
+    result.data = users
+    res.data = result
     return Promise.resolve(res)
   });
 }
@@ -371,15 +414,15 @@ Vue.prototype.queryFollowersFor = function (user_id, startFrom, limitation) {
     startFrom: startFrom,
     limitation: limitation
   }
-  return post(RELATION + "queryFollowersFor/" + user_id, data).then(res=>{
-    var user_infos=res.data.data
-    var result=createResData(res.data)
-    var users=new Array()
-    for(var i of user_infos){
+  return post(RELATION + "queryFollowersFor/" + user_id, data).then(res => {
+    var user_infos = res.data.data
+    var result = createResData(res.data)
+    var users = new Array()
+    for (var i of user_infos) {
       users.push(transformUserPublicInfo(i))
     }
-    result.data=users
-    res.data=result
+    result.data = users
+    res.data = result
     return Promise.resolve(res)
   });
 }
@@ -395,14 +438,14 @@ Vue.prototype.if_following = function (follower_id, be_followed_id) {
   if (!checkNumber(follower_id, be_followed_id)) {
     return null;
   }
-  return post(RELATION + "if_following?follower_id=" + follower_id + "&be_followed_id=" + be_followed_id).then(res=>{
-    var data=new Object()
-    if(res.data.data!=0){
-      data.if_following=true;
-    }else{
-      data.if_following=false;
+  return post(RELATION + "if_following?follower_id=" + follower_id + "&be_followed_id=" + be_followed_id).then(res => {
+    var data = new Object()
+    if (res.data.data != 0) {
+      data.if_following = true;
+    } else {
+      data.if_following = false;
     }
-    res.data.data=data
+    res.data.data = data
     return Promise.resolve(res)
   });
 }
@@ -412,14 +455,14 @@ Vue.prototype.if_following_by_me = function (be_followed_id) {
     return null;
   }
   console.log(RELATION + "if_following_by_me/" + be_followed_id)
-  return get(RELATION + "ifFollowingByMe/" + be_followed_id).then(res=>{
-    var data=new Object()
-    if(res.data.data!=0){
-      data.if_following=true;
-    }else{
-      data.if_following=false;
+  return get(RELATION + "ifFollowingByMe/" + be_followed_id).then(res => {
+    var data = new Object()
+    if (res.data.data != 0) {
+      data.if_following = true;
+    } else {
+      data.if_following = false;
     }
-    res.data.data=data
+    res.data.data = data
     return Promise.resolve(res)
   });
 }
@@ -450,16 +493,16 @@ Vue.prototype.queryLikes = function (user_id) {
     limitation: limitation
   }
   return post(
-    LIKE + "query/" + user_id,data 
-  ).then(res=>{
-    var message_infos=res.data.data
-    var result=createResData(res.data)
-    var messages=new Array()
-    for(var i of message_infos){
+    LIKE + "query/" + user_id, data
+  ).then(res => {
+    var message_infos = res.data.data
+    var result = createResData(res.data)
+    var messages = new Array()
+    for (var i of message_infos) {
       messages.push(transformMessage(i))
     }
-    result.data=messages
-    res.data=result
+    result.data = messages
+    res.data = result
     return Promise.resolve(res)
   })
 }
@@ -468,14 +511,14 @@ Vue.prototype.checkUserLikesMessage = function (user_id, message_id) {
   if (!checkNumber(user_id, message_id)) {
     return null;
   }
-  return post(LIKE + "checkUserLikesMessage?user_id=" + user_id + "&message_id=" + message_id).then(res=>{
-    var data=new Object()
-    if(res.data.data!=0){
-      data.like=true;
-    }else{
-      data.like=false;
+  return post(LIKE + "checkUserLikesMessage?user_id=" + user_id + "&message_id=" + message_id).then(res => {
+    var data = new Object()
+    if (res.data.data != 0) {
+      data.like = true;
+    } else {
+      data.like = false;
     }
-    res.data.data=data
+    res.data.data = data
     return Promise.resolve(res)
   });
 }
@@ -489,7 +532,17 @@ Vue.prototype.queryForMe = function (startFrom, limitation) {
     startFrom: startFrom,
     limitation: limitation
   }
-  return post(PRIVATE_LETTER + "queryForMe", data);
+  return post(PRIVATE_LETTER + "queryForMe", data).then(res => {
+    var letter_infos = res.data.data
+    var result = createResData(res.data)
+    var letters = new Array()
+    for (var i of letter_infos) {
+      letters.push(transfromPrivateLetter(i))
+    }
+    result.data = messages
+    res.data = result
+    return Promise.resolve(res)
+  });
 }
 //sendPrivateLetter(user_id, letter)
 //发送私信
@@ -515,7 +568,7 @@ Vue.prototype.queryLatestContact = function (startFrom, limitation) {
     startFrom: startFrom,
     limitation: limitation
   }
-  return post(PRIVATE_LETTER + "queryLatestContact", data);
+  return post(PRIVATE_LETTER + "queryLatestContact", data).then();
 }
 ///api/PrivateLetter/querySpecified
 Vue.prototype.querySpecified = function (contact_id, startFrom, limitation) {
@@ -523,7 +576,17 @@ Vue.prototype.querySpecified = function (contact_id, startFrom, limitation) {
     startFrom: startFrom,
     limitation: limitation
   }
-  return post(PRIVATE_LETTER + "querySpecified/" + contact_id, data);
+  return post(PRIVATE_LETTER + "querySpecified/" + contact_id, data).then(res => {
+    var letter_infos = res.data.data
+    var result = createResData(res.data)
+    var letters = new Array()
+    for (var i of letter_infos) {
+      letters.push(transfromPrivateLetter(i))
+    }
+    result.data = messages
+    res.data = result
+    return Promise.resolve(res)
+  });
 }
 
 
@@ -535,7 +598,13 @@ Vue.prototype.queryMessage = function (message_id) {
   if (!checkNumber(message_id)) {
     return null;
   }
-  return post(MESSAGE + "query?message_id=" + message_id);
+  return post(MESSAGE + "query?message_id=" + message_id).then(res => {
+    if (res.data.data) {
+      var res_data = res.data.data
+      res.data.data = transformMessage(res_data);
+    }
+    return Promise.resolve(res)
+  });
 }
 ///api/Message/queryNewestMessage
 Vue.prototype.queryNewestMessage = function (startFrom, limitation) {
@@ -557,7 +626,17 @@ Vue.prototype.queryMessagesOf = function (user_id, startFrom, limitation) {
     startFrom: startFrom,
     limitation: limitation
   }
-  return post(MESSAGE + "queryMessage/" + user_id, data)
+  return post(MESSAGE + "queryMessage/" + user_id, data).then(res => {
+    var message_infos = res.data.data
+    var result = createResData(res.data)
+    var messages = new Array()
+    for (var i of message_infos) {
+      messages.push(transformMessage(i))
+    }
+    result.data = messages
+    res.data = result
+    return Promise.resolve(res)
+  })
 }
 //queryFollowMessage(startFrom, limitation)
 Vue.prototype.queryFollowMessage = function (startFrom, limitation) {
@@ -565,7 +644,17 @@ Vue.prototype.queryFollowMessage = function (startFrom, limitation) {
     startFrom: startFrom,
     limitation: limitation
   }
-  return post(MESSAGE + "queryFollowMessage", data);
+  return post(MESSAGE + "queryFollowMessage", data).then(res => {
+    var message_infos = res.data.data
+    var result = createResData(res.data)
+    var messages = new Array()
+    for (var i of message_infos) {
+      messages.push(transformMessage(i))
+    }
+    result.data = messages
+    res.data = result
+    return Promise.resolve(res)
+  });
 }
 //sendMessage(formData: {message_content, message_has_image, message_image_count, files})
 Vue.prototype.sendMessage = function (formData) {
@@ -599,7 +688,17 @@ Vue.prototype.queryCollections = function (user_id, startFrom, limitation) {
     limitation: limitation
   }
   console.log("查看收藏：：：：" + COLLECTION + "query/" + user_id)
-  return post(COLLECTION + "query/" + user_id, data);
+  return post(COLLECTION + "query/" + user_id, data).then(res => {
+    var message_infos = res.data.data
+    var result = createResData(res.data)
+    var messages = new Array()
+    for (var i of message_infos) {
+      messages.push(transformMessage(i))
+    }
+    result.data = messages
+    res.data = result
+    return Promise.resolve(res)
+  });
 }
 //checkUserCollectMessage(user_id, message_id)
 //检查是否收藏
@@ -610,23 +709,47 @@ Vue.prototype.checkUserCollectMessage = function (user_id, message_id) {
   return post(COLLECTION + "checkUserCollectMessage?user_id="
     + user_id
     + "&message_id="
-    + message_id);
+    + message_id).then(res=>{
+      var data=new Object()
+      if(res.data.data!=0){
+        data.favor=true;
+      }else{
+        data.favor=false;
+      }
+      res.data.data=data;
+      return Promise.resolve(res)
+    });
 }
 //getCollectionNum(user_id)
 //获取收藏数量
 Vue.prototype.getCollectionNum = function (user_id) {
-  return post(COLLECTION + "getCollectionNum?user_id=" + user_id);
+  return post(COLLECTION + "getCollectionNum?user_id=" + user_id).then(res=>{
+    var data=new Object()
+    data.collection_num=res.data.data;
+    res.data.data=data;
+    return Promise.resolve(res)
+  });
 }
 //////////////////////////////////////////////////////////////////////////////////////////////
 //AT 艾特
-var AT = "api/At/";
+var AT = "api/at/";
 //queryAtMe(startFrom, limitation)
 Vue.prototype.queryAtMe = function (startFrom, limitation) {
   var data = {
     startFrom: startFrom,
     limitation: limitation
   }
-  return post(AT + "query", data);
+  return post(AT + "query", data).then(res => {
+    var message_infos = res.data.data
+    var result = createResData(res.data)
+    var messages = new Array()
+    for (var i of message_infos) {
+      messages.push(transformMessage(i))
+    }
+    result.data = messages
+    res.data = result
+    return Promise.resolve(res)
+  });
 }
 Vue.prototype.queryUnreadAt = function () {
   console.log("Atljklk")
@@ -637,7 +760,15 @@ Vue.prototype.queryUnreadAt = function () {
 //评论
 var COMMENT = "api/Comment/";
 Vue.prototype.queryComment = function (id, data) {
-  return post(COMMENT + 'queryComments/' + id, data);
+  return post(COMMENT + 'queryComments/' + id, data).then(res=>{
+    if(res.data.data){
+      var tmp=new Object();
+      tmp.comment=transformComment(res.data.data.comment)
+      tmp.userPublicInfo=transformUserPublicInfo(res.data.data.userPublicInfo)
+      res.data.data=tmp;
+    }
+    return Promise.resolve(res)
+  });
 }
 Vue.prototype.addComment = function (id, data) {
   return post(COMMENT + 'add/' + id, data);
