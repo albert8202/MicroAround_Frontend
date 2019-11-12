@@ -114,14 +114,14 @@ export default {
     console.log(Response)
     if(Response.data.code==200 && Response.data.message=="success")
       {
-        this.userName = Response.data.data.nickname
-        this.address = Response.data.data.avatar_url
+        this.userName = Response.data.data.userNickname
+        this.address = Response.data.data.avatarUrl
         console.log(this.userName)
       }
       else{
         console.log("fail")
         this.userName="userName"
-      }  
+      }
     })
     if(!_this.inject_topics){
       _this.queryTopicsBaseOnHeat(1, 5).then(Response => {
@@ -129,16 +129,16 @@ export default {
         _this.topics = Response.data.data;
       })
     }else{
-      _this.topics = _this.inject_topics 
+      _this.topics = _this.inject_topics
     }
-    
+
   },
   methods: {
     tapTopic(topic) {
-      console.log("测试点击 topic_id:", topic.topic_id);
+      console.log("测试点击 topic_id:", topic.topicId);
       this.$router.push({
         path: "/Topic",
-        query: { topic_id: topic.topic_id, topic_name: topic.topic_content }
+        query: { topic_id: topic.topicId, topic_name: topic.topicContent }
       });
     }
   },

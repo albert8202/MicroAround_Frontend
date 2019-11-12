@@ -93,7 +93,7 @@ export default {
               title: 'Login Success!',
               desc:''
             })
-            var i = Response.data.data.userID
+            var i = Response.data.data
             //User.userID = i;
             //console.log(User.userID)
             //加入coockie

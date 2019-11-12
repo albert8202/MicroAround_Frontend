@@ -614,9 +614,9 @@ export default {
       }
       if (val) {
         var temp = new Object();
-        temp.user_id = this.my_info.user_id;
-        temp.avatar_url = this.my_info.avatar_url;
-        temp.nickname = this.my_info.nickname;
+        temp.user_id = this.my_info.userId;
+        temp.avatar_url = this.my_info.avatarUrl;
+        temp.nickname = this.my_info.userNickname;
         k.push(temp);
       }
       this.followersList = k;
