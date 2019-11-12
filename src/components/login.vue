@@ -81,7 +81,7 @@ export default {
         }
         this.signIn(data).then(Response=>{
           console.log(Response);
-          if(Response.data.code==200 && Response.data.message=="Sign in success")
+          if(Response.data.code==200 && Response.data.message=="success" && Response.data.data.user_id!=0)
           {
             this.checkLogin().then(Response=>{
               console.log('aa',Response)
@@ -101,7 +101,7 @@ export default {
             console.log(document.cookie)
             this.$router.push("/home");
           }
-          else if(Response.data.code==200 && Response.data.message=="E-mail or Password Wrong")
+          else if(Response.data.code==200 && Response.data.data.user_id==0)
           {
             //失败
             this.loading=false

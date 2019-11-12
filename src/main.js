@@ -55,18 +55,38 @@ function checkString(){
 function post(url, data){
   return axios({
     method: "POST",
-    url: "http://localhost:12293/" + url,
+    url: "http://localhost:8008/" + url,
     //url: url,
     data: data,
   })
 }
 function get(url){
-  return axios.get("http://localhost:12293/" + url);
+  return axios.get("http://localhost:8008/" + url);
 }
+
+function createResData(data){
+  var result=new Object();
+  result.code=data.code;
+  result.message=data.message;
+  result.data=null;
+  return result
+}
+
 ///////////////////////////////////////////
 //USER
 Vue.prototype.checkLogin = function (){
-  return get("api/user/checkIfSignUp")
+  return get("api/user/checkIfSignUp").then(res=>{
+    var result=createResData(res.data);
+    result.data=new Object();
+    if(res.data.data){
+      result.message="Aready login"
+    }else{
+      result.message="Need Authentication"
+    }
+    res.data=result;
+    return res;
+  })
+  
 }
 //getUserPublicInfo
 Vue.prototype.getUserPublicInfo = function (user_id)
@@ -74,13 +94,53 @@ Vue.prototype.getUserPublicInfo = function (user_id)
   if(!checkNumber(user_id)){
     return null;
   }
-  return get("api/user/getUserPublicInfo/" + user_id);
+  return get("api/user/getUserPublicInfo/" + user_id).then(res=>{
+    var result=createResData(res.data);
+    var data=new Object();
+    var res_data=res.data.data;
+    data.user_id=res_data.userId;
+    data.nickname=res_data.userNickname
+    data.self_introction=res_data.userSelfIntroduction
+    data.register_time=res_data.userRegisterTime
+    data.followers_num=res_data.userFollowersNum
+    data.follows_num=res_data.userFollowsNum
+    data.messages_num=res_data.userMessagesNum
+    data.avatar_url=res_data.avatarUrl
+    data.collection_num=res_data.userCollectionsNum
+    result.data=data;
+    return result
+  });
 }
 //getUserAllInfo
 Vue.prototype.getUserAllInfo = function (){
   return get(
     "api/user/getAllUserInfo"
-  );
+  ).then(res=>{
+    var result=createResData(res.data);
+    result.data=new Object();
+    var data=new Object();
+    var res_data=res.data.data;
+
+    data.user_id=res_data.userId;
+    data.nickname=res_data.userNickname
+    data.self_introction=res_data.userSelfIntroduction
+    data.register_time=res_data.userRegisterTime
+    data.followers_num=res_data.userFollowersNum
+    data.follows_num=res_data.userFollowsNum
+    data.messages_num=res_data.userMessagesNum
+    data.avatar_url=res_data.avatarUrl
+    data.collection_num=res_data.userCollectionsNum
+    result.data.userPublicInfo=data;
+
+    data=new Object();
+    data.user_id=res_data.userId;
+    data.user_email=res_data.userEmail
+    data.user_gender=(res_data.userGender)?res_data.userGender:null
+    data.user_password=res_data.userPassword
+    data.user_realname=(res_data.userRealName)?res_data.userRealName:null
+    result.data.user_Private_Info=data;
+    return result;
+  });
 }
 //register(data : {email, password, nickname})
 Vue.prototype.register = function (data){
@@ -96,7 +156,13 @@ Vue.prototype.signIn = function (data){
   if(!checkString(data.email, data.password)){
     return null;
   }
-  return post("api/user/signIn", data);
+  return post("api/user/signIn", data).then(res=>{
+    var result=createResData(res.data);
+    var data=new Object();
+    data.user_id=res.data
+    result.data=data;
+    return result;
+  });
 }
 //editInfo(data: {nickname, password. realname, gender, self_introduction})
 Vue.prototype.editInfo = function (data){
@@ -121,7 +187,7 @@ Vue.prototype.getAvatarImageSrc = function (user_id){
 }
 //logOut()
 Vue.prototype.logOut = function (){
-  return get("api/user/logOut");
+  return get("api/user/logout");
 }
 //uploadAvatar(formData)
 // formData : {'file': file}
