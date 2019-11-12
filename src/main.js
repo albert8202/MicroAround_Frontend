@@ -163,7 +163,17 @@ function transformComment(res_data){
   data.comment_create_time=res_data.commentCreateTime
   return data;
 }
-
+function transfromContactPerson(res_data){
+  if(!res_data){
+    return null;
+  }
+  var data = new Object();
+  data.contact_person_id=res_data.userId
+  data.contact_nickname=res_data.userNickname
+  data.contact_time=res_data.UTIME
+  data.contact_person_avator_url=res_data.avatarUrl
+  return data;
+}
 ///////////////////////////////////////////
 //USER
 Vue.prototype.checkLogin = function () {
@@ -568,7 +578,17 @@ Vue.prototype.queryLatestContact = function (startFrom, limitation) {
     startFrom: startFrom,
     limitation: limitation
   }
-  return post(PRIVATE_LETTER + "queryLatestContact", data).then();
+  return post(PRIVATE_LETTER + "queryLatestContact", data).then(res => {
+    var contact_infos = res.data.data
+    var result = createResData(res.data)
+    var contact_persons = new Array()
+    for (var i of contact_infos) {
+      contact_persons.push(transfromContactPerson(i))
+    }
+    result.data = messages
+    res.data = result
+    return Promise.resolve(res)
+  });
 }
 ///api/PrivateLetter/querySpecified
 Vue.prototype.querySpecified = function (contact_id, startFrom, limitation) {
@@ -615,7 +635,17 @@ Vue.prototype.queryNewestMessage = function (startFrom, limitation) {
     startFrom: startFrom,
     limitation: limitation
   }
-  return post(MESSAGE + "queryNewestMessage", data);
+  return post(MESSAGE + "queryNewestMessage", data).then(res => {
+    var message_infos = res.data.data
+    var result = createResData(res.data)
+    var messages = new Array()
+    for (var i of message_infos) {
+      messages.push(transformMessage(i))
+    }
+    result.data = messages
+    res.data = result
+    return Promise.resolve(res)
+  });
 }
 //queryMessagesOf(user_id, startFrom, limitation)
 Vue.prototype.queryMessagesOf = function (user_id, startFrom, limitation) {
