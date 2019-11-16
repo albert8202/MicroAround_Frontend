@@ -62,7 +62,7 @@ function get(url) {
 }
 
 function createResData(data) {
-  if(!res_data){
+  if(!data){
     return null;
   }
   var result = new Object();
@@ -612,7 +612,7 @@ Vue.prototype.querySpecified = function (contact_id, startFrom, limitation) {
 
 ///////////////////////////////////////////////////////////////////////////////
 //MESSAGE推特
-var MESSAGE = "api/Message/";
+var MESSAGE = "api/message/";
 //queryMessage(message_id)
 Vue.prototype.queryMessage = function (message_id) {
   if (!checkNumber(message_id)) {
