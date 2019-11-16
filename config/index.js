@@ -21,14 +21,21 @@ module.exports = {
     poll: false, // https://webpack.js.org/configuration/dev-server/#devserver-watchoptions-
     proxyTable: {
       '/api' :{
-        target : 'http://localhost:12293',
+        target : 'http://localhost:8008',
         changeOrigin: false,
         pathRewrite:{
           '^/api' : '/api'
         }
       },
       '/avatars' :{
-        target : 'http://localhost:12293',
+        target : 'http://localhost:8008',
+        changeOrigin: true,
+        pathRewrite:{
+          '^/avatars' : '/avatars'
+        }
+      },
+      '/upload' : {
+        target : 'http://localhost:8008',
         changeOrigin: true,
         pathRewrite:{
           '^/avatars' : '/avatars'

@@ -244,7 +244,7 @@ Vue.prototype.setAvatar = function (avatar_id) {
   if (!checkNumber(avatar_id)) {
     return null;
   }
-  return get("api/User/setAvatar/" + avatar_id);
+  return get("api/user/setAvatar/" + avatar_id);
 }
 //getAvatarImageSrc(user_id)
 Vue.prototype.getAvatarImageSrc = function (user_id) {
@@ -262,7 +262,7 @@ Vue.prototype.logOut = function () {
 Vue.prototype.uploadAvatar = function (params, config) {
   return axios
     .post(
-      "/api/User/uploadAvatar",
+      "/api/user/uploadAvatar",
       params,
       config
     )
@@ -279,8 +279,8 @@ Vue.prototype.getRecommendUsers = function () {
       var temp = new Object()
       temp.user_id = i.userId
       temp.user_nickname = i.userNickname
-      temp.followers_num = i.avatarUrl
-      temp.avatar_url = i.userFollowersNum
+      temp.followers_num = i.userFollowersNum
+      temp.avatar_url = i.avatarUrl
       data.push(temp);
     }
     result.data = data;
@@ -469,7 +469,7 @@ Vue.prototype.if_following_by_me = function (be_followed_id) {
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 //LIKE点赞
 //like(message_id)
-var LIKE = "api/Like/";
+var LIKE = "api/like/";
 Vue.prototype.like = function (message_id) {
   if (!checkNumber(message_id)) {
     return null;
@@ -511,7 +511,7 @@ Vue.prototype.checkUserLikesMessage = function (user_id, message_id) {
   if (!checkNumber(user_id, message_id)) {
     return null;
   }
-  return post(LIKE + "checkUserLikesMessage?user_id=" + user_id + "&message_id=" + message_id).then(res => {
+  return get(LIKE + "checkUserLikesMessage?user_id=" + user_id + "&message_id=" + message_id).then(res => {
     var data = new Object()
     if (res.data.data != 0) {
       data.like = true;
@@ -524,7 +524,7 @@ Vue.prototype.checkUserLikesMessage = function (user_id, message_id) {
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////
 //PRIVATE_LETTER私信
-var PRIVATE_LETTER = "api/PrivateLetter/";
+var PRIVATE_LETTER = "api/privateLetter/";
 //queryForMe(startFrom, limitation)
 Vue.prototype.queryForMe = function (startFrom, limitation) {
 
@@ -646,6 +646,9 @@ Vue.prototype.queryFollowMessage = function (startFrom, limitation) {
   }
   return post(MESSAGE + "queryFollowMessage", data).then(res => {
     var message_infos = res.data.data
+    if(!message_infos){
+      return Promise.resolve(res);
+    }
     var result = createResData(res.data)
     var messages = new Array()
     for (var i of message_infos) {
@@ -671,7 +674,7 @@ Vue.prototype.deleteMessage = function (message_id) {
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //COLLECTION 收藏
-var COLLECTION = "api/Collection/"
+var COLLECTION = "api/collection/"
 //addCollection(message_id)
 Vue.prototype.addCollection = function (message_id) {
   return post(COLLECTION + "add?message_id=" + message_id);
@@ -758,7 +761,7 @@ Vue.prototype.queryUnreadAt = function () {
 
 //////////////////////////////////////////////////////
 //评论
-var COMMENT = "api/Comment/";
+var COMMENT = "api/comment/";
 Vue.prototype.queryComment = function (id, data) {
   return post(COMMENT + 'queryComments/' + id, data).then(res=>{
     if(res.data.data){

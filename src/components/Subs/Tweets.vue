@@ -134,7 +134,8 @@ export default {
           this.items.length + 1,
           10
         ).then(Response => {
-
+          console.log("423");
+          console.log(Response);
           this.$emit("stop_loading");
           console.log("結束獲取")
           this.twiDatas = Response.data.data;
