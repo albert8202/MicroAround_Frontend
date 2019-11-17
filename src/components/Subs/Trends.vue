@@ -100,40 +100,43 @@ export default {
   data() {
     return {
       topics: undefined,
-      address: "http://localhost:12293/avatars/0.jpg",
+      address: "/upload/avatar/0",
       userName:"userName",
       userID:"0"
     };
   },
   mounted() {
     var _this = this;
-    this.userID = _this.getCookie("userID")
-    console.log("登录：", this.userID)
-    console.log(this.userID)
-    this.getUserPublicInfo(this.userID).then(Response=>{
-    console.log(Response)
-    if(Response.data.code==200 && Response.data.message=="success")
-      {
-        this.userName = Response.data.data.nickname
-        this.address = Response.data.data.avatar_url
-        console.log(this.userName)
-      }
-      else{
-        console.log("fail")
-        this.userName="userName"
-      }  
-    })
-    if(!_this.inject_topics){
-      _this.queryTopicsBaseOnHeat(1, 5).then(Response => {
+    _this.getCookies("userID").then(userID => {
+      _this.userID = userID;
+      console.log("登录：", _this.userID)
+      console.log(_this.userID)
+      _this.getUserPublicInfo(_this.userID).then(Response=>{
+        console.log(Response)
+        if(Response.data.code==200 && Response.data.message=="success"){
+          _this.userName = Response.data.data.nickname
+          _this.address = Response.data.data.avatar_url
+          console.log(_this.userName)
+        }else{
+          console.log("fail")
+          _this.userName="userName"
+        }  
+      });
+      if(!_this.inject_topics){
+        _this.queryTopicsBaseOnHeat(1, 5).then(Response => {
         console.log(Response);
         _this.topics = Response.data.data;
       })
-    }else{
-      _this.topics = _this.inject_topics 
-    }
+      }else{
+        _this.topics = _this.inject_topics 
+      }
+    });
     
   },
   methods: {
+    getCookies(a){
+      return this.getCookie(a);
+    },
     tapTopic(topic) {
       console.log("测试点击 topic_id:", topic.topic_id);
       this.$router.push({

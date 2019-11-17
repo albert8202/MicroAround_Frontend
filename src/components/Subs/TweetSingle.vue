@@ -148,7 +148,7 @@
             <usermessage
               style="float:right;margin-right: 10px"
               v-bind:userId="item.message_sender_user_id"
-              v-if="getCookies('userID') != item.message_sender_user_id"
+              v-if="myUserId != item.message_sender_user_id"
             ></usermessage>
           </div>
         </div>
@@ -272,7 +272,7 @@
             <usermessage
               style="float:right;margin-right: 10px"
               v-bind:userId="item.message_sender_user_id"
-              v-if="item.message_sender_user_id == this.getCookies()"
+              v-if="item.message_sender_user_id == myUserId"
             ></usermessage>
           </div>
         </div>
@@ -375,7 +375,8 @@ export default {
       userAvt:"",
       userName:"user",
       rawItemUserAvt: "",
-      rawItemUserName: ""
+      rawItemUserName: "",
+      myUserId : 0,
     };
   },
   methods: {
@@ -384,11 +385,15 @@ export default {
       return this.getCookie(name);
     },
     ifBeMyTwi() {
-      if (this.item.message_sender_user_id == this.getCookies("userID")) {
-        return true;
-      } else {
-        return false;
-      }
+      var _this = this;
+      return this.getCookies("userID").then(userID => {
+        return _this.item.message_sender_user_id == userID;
+      })
+      // if (this.item.message_sender_user_id == this.getCookies("userID")) {
+      //   return true;
+      // } else {
+      //   return false;
+      // }
     },
     doShowMenu() {
       this.showMenu = !this.showMenu;
@@ -467,18 +472,22 @@ export default {
         limitation: 10
       };
       this.queryComment(this.item.message_id, data).then(Response => {
+        console.log("222", Response);
         this.comments = Response.data.data;
       });
     },
     doSendComment(content) {
       let data = {
+        message_id: this.item.message_id,
         comment_content: content
       };
-      this.addComment(this.item.message_id, data).then(Response => {
+      this.addComment(data).then(Response => {
+        console.log("210", data, Response);
         if (Response.data.message == "success") {
           this.commentsNum += 1;
           this.commented = true;
-          this.getUserPublicInfo(this.getCookies("userID")).then(Response => {
+          this.getCookies("userID").then(userID => {
+            this.getUserPublicInfo(userID).then(Response => {
             let timeObj = new Date();
             if (Response.data.message == "success") {
               let commTemp = {
@@ -499,6 +508,7 @@ export default {
               });
             }
           });
+          })
         } else {
           this.$Notice.error({
             title: "You should say something.",
@@ -516,23 +526,43 @@ export default {
     }
   },
   created() {
+    var _this = this;
+    this.getCookies("userID").then(userID => {
+      _this.myUserId = userID;
+    });
     this.collectByUser = this.item.collectByUser;
     this.likeByUser = this.item.likeByUser;
     this.followByUser = this.item.followByUser;
     this.commentsNum = this.item.message_comment_num;
     //求证是否点赞收藏关注
-    this.checkUserLikesMessage(
-      this.getCookies("userID"),
-      this.item.message_id
-    ).then(Response => {
-      this.likeByUser = Response.data.data.like;
+    this.getCookies("userID").then(userID => {
+      _this.checkUserLikesMessage(
+        userID,
+        _this.item.message_id
+      ).then(Response => {
+        console.log("609", Response);
+        _this.likeByUser = Response.data.data.like;
+      });
+      _this.checkUserCollectMessage(
+        userID,
+        _this.item.message_id
+      ).then(Response => {
+        _this.collectByUser = Response.data.data.favor;
     });
-    this.checkUserCollectMessage(
-      this.getCookies("userID"),
-      this.item.message_id
-    ).then(Response => {
-      this.collectByUser = Response.data.data.favor;
-    });
+    })
+    // this.checkUserLikesMessage(
+    //   this.getCookies("userID"),
+    //   this.item.message_id
+    // ).then(Response => {
+    //   console.log("609", Response);
+    //   this.likeByUser = Response.data.data.like;
+    // });
+    // this.checkUserCollectMessage(
+    //   this.getCookies("userID"),
+    //   this.item.message_id
+    // ).then(Response => {
+    //   this.collectByUser = Response.data.data.favor;
+    // });
     this.if_following_by_me(this.item.message_sender_user_id).then(Response => {
       this.followByUser = Response.data.data.if_following;
     });
@@ -541,6 +571,7 @@ export default {
     this.getUserPublicInfo(this.item.message_sender_user_id).then(
       Response => {
         this.userName = Response.data.data.nickname;
+        console.log("601" , this.item ,Response);
         this.userAvt = Response.data.data.avatar_url;
 
       }

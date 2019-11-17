@@ -385,7 +385,7 @@ bottom:0;
       <div id="middle-right-container">
         <div id="middle-right-top-container">
 
-          <UserMessage v-if="visitor!=getCookies('userID')" :userId="visitor" class="message-button-container">
+          <UserMessage v-if="visitor!=user" :userId="visitor" class="message-button-container">
           </UserMessage>
 
           <div v-if="visitor!=user" class="follow-button-container">
@@ -467,10 +467,21 @@ export default {
     UserMessage
   },
   created() {
-    
+    var _this = this;
+    //tmd 参观者还是被参观者啊到底。。。。。。
     this.visitor = Number(this.$route.query.visitor_id);
-    this.user = this.getCookies("userID");
-    console.log("user", this.user);
+    //user到底是什么鬼
+    this.getCookies("userID").then(userID => {
+      if(!userID){
+        _this.$router.push("index");
+        return;
+      }
+      _this.user = userID;
+      console.log("user", userID);
+      _this.getUserPublicInfo(userID).then(response => {
+        _this.my_info = response.data.data;
+      });
+    });
     try {
       var _this = this;
       this.getUserPublicInfo(this.visitor).then(response => {
@@ -496,9 +507,6 @@ export default {
         _this.followersList = res[2].data.data;
         console.log("这个人的followersList", _this.followersList);
       });
-      this.getUserPublicInfo(this.user).then(response => {
-        this.my_info = response.data.data;
-      });
     } catch (e) {
       return {
         result: false,
@@ -509,8 +517,10 @@ export default {
   mounted: function getUser() {
     // this.loading = true;
     this.visitor = Number(this.$route.query.visitor_id);
-    this.user = this.getCookies("userID");
-    console.log("user", this.user);
+    if(!this.visitor){
+      this.$router.push("home")
+    }
+    var _this = this;
   },
   methods: {
     setFalseStatus() {
@@ -653,11 +663,12 @@ export default {
   },
   beforeRouteEnter(to,from,next){
       next(vm=>{
-        if(!vm.getCookie("userID"))
-        {
-          console.log("请先登录")
-          vm.$router.push("index")
-        }
+        vm.getCookie("userID").then(res => {
+            if(!res){
+              console.log("请先登录")
+              vm.$router.push("index")
+            }
+        });
       })
     }
 };

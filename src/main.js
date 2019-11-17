@@ -10,26 +10,59 @@ import router from './router'
 import ElementUI from 'element-ui'
 import 'element-ui/lib/theme-chalk/index.css'
 import 'iview/dist/styles/iview.css'
+import $ from 'jquery'
 //写cookies
 Vue.prototype.setCookie = function (name, value) {
+  // Vue.prototype.userId = value;
   var Days = 30;
   var exp = new Date();
   exp.setTime(exp.getTime() + Days * 24 * 60 * 60 * 1000);
   document.cookie = name + "=" + escape(value) + ";expires=" + exp.toGMTString();
 }
-//读取cookies
-Vue.prototype.getCookie = function (name) {
+//读取浏览器中的cookie
+Vue.prototype.getCookieInBrowser = function (name) {
   var arr, reg = new RegExp("(^| )" + name + "=([^;]*)(;|$)");
-  if (arr = document.cookie.match(reg)) return unescape(arr[2]);
-  else return null;
+  if (arr = document.cookie.match(reg)) {
+    return unescape(arr[2]);
+  }else{
+    return null;
+  }
+}
+//读取cookies，并确认后端是否登录。
+Vue.prototype.getCookie = function (name) {
+  // if(Vue.prototype.userId){
+  //   return Vue.prototype.userId
+  // }
+  // return null;
+  // var res = get_sync("/api/user/getUserId");
+  // console.log("523", res)
+  // return res.data.data==0?null:res.data.data;
+  var cookieInBrowser = Vue.prototype.getCookieInBrowser(name);
+  if(cookieInBrowser){
+    return Vue.prototype.checkLogin().then(res => {
+      console.log("getCookie", res);
+      if(res.data.message === "Need Authentication"){
+        Vue.prototype.delCookie("userID");
+        return Promise.resolve(null);
+      }
+      return Promise.resolve(cookieInBrowser);
+    })
+  }
+  return Promise.resolve(null);
 }
 //删除cookies
 Vue.prototype.delCookie = function (name) {
+  // Vue.prototype.userId = null;
   console.log('fff')
   var exp = new Date();
   exp.setTime(exp.getTime() - 1);
-  var cval = this.getCookie(name);
-  if (cval != null) document.cookie = name + "=" + cval + ";expires=" + exp.toGMTString();
+  var cookieInBrowser = Vue.prototype.getCookieInBrowser(name);
+  if(cookieInBrowser){
+    document.cookie = name + "=" + cookieInBrowser + ";expires=" + exp.toGMTString();
+  }
+  // this.getCookie(name).then(cval=>{
+  //   if (cval != null) document.cookie = name + "=" + cval + ";expires=" + exp.toGMTString();
+  // });
 }
 
 //developed by 杨紫超
@@ -59,6 +92,18 @@ function post(url, data) {
 }
 function get(url) {
   return axios.get("http://localhost:8008/" + url);
+}
+
+function get_sync(url) {
+  var backData;
+  $.ajax({
+    url: url,
+    type: 'GET',
+    async: false
+  }).done(res => {
+    backData = res
+  });
+  return backData;
 }
 
 function createResData(data) {
@@ -112,17 +157,17 @@ function transformMessage(res_data) {
   data.message_content = res_data.messageContent
   data.message_create_time = res_data.messageCreateTime
   data.message_like_num = res_data.messageAgreeNum
-  data.message_transpond_num=null
+  data.message_transpond_num= res_data.messageTranspondNum
   data.message_comment_num = res_data.messageCommentNum
   data.message_view_num = res_data.messageViewNum
   data.message_has_image = res_data.messageHasImage
-  data.message_sender_user_id = null
+  data.message_sender_user_id = res_data.messageSenderUserId
   data.message_heat = res_data.messageHeat
-  data.message_image_count = null;
-  data.message_transpond_message_id = null;
+  data.message_image_count = res_data.messageImageCount;
+  data.message_transpond_message_id = res_data.messageTranspondMessageId;
   data.message_topics = res_data.messageTopics;
   data.message_ats = res_data.messageAts;
-  data.message_image_urls = new Array();
+  data.message_image_urls = res_data.messageImageUrls;
   return data
 }
 
@@ -237,7 +282,15 @@ Vue.prototype.editInfo = function (data) {
   if (!checkString(data.nickname, data.password, data.realname, data.gender, data.self_introduction)) {
     return null;
   }
-  return post("api/user/editInfo", data);
+  console.log("122", data);
+  let dataForward = {
+    nickname : data.nickname,
+    password : data.password,
+    realName : data.realname,
+    gender   : data.gender,
+    selfIntroduction : data.self_introduction
+  };
+  return post("api/user/editInfo", dataForward);
 }
 //setAvatar(avatar_id)
 Vue.prototype.setAvatar = function (avatar_id) {
@@ -474,14 +527,14 @@ Vue.prototype.like = function (message_id) {
   if (!checkNumber(message_id)) {
     return null;
   }
-  return get(LIKE + message_id);
+  return get(LIKE + "addLike/" + message_id);
 }
 //cancelLike(message_id)
 Vue.prototype.cancelLike = function (message_id) {
   if (!checkNumber(message_id)) {
     return null;
   }
-  return get(LIKE + "cancel/" + message_id);
+  return get(LIKE + "cancelLike/" + message_id);
 }
 //queryLikes(user_id)
 Vue.prototype.queryLikes = function (user_id) {
@@ -493,7 +546,7 @@ Vue.prototype.queryLikes = function (user_id) {
     limitation: limitation
   }
   return post(
-    LIKE + "query/" + user_id, data
+    LIKE + "queryLikes/" + user_id, data
   ).then(res => {
     var message_infos = res.data.data
     var result = createResData(res.data)
@@ -511,7 +564,7 @@ Vue.prototype.checkUserLikesMessage = function (user_id, message_id) {
   if (!checkNumber(user_id, message_id)) {
     return null;
   }
-  return get(LIKE + "checkUserLikesMessage?user_id=" + user_id + "&message_id=" + message_id).then(res => {
+  return post(LIKE + "checkUserLikesMessage?user_id=" + user_id + "&message_id=" + message_id).then(res => {
     var data = new Object()
     if (res.data.data != 0) {
       data.like = true;
@@ -615,7 +668,17 @@ Vue.prototype.queryNewestMessage = function (startFrom, limitation) {
     startFrom: startFrom,
     limitation: limitation
   }
-  return post(MESSAGE + "queryNewestMessage", data);
+  return post(MESSAGE + "queryNewestMessage", data).then(res => {
+    var message_infos = res.data.data
+    var result = createResData(res.data)
+    var messages = new Array()
+    for (var i of message_infos) {
+      messages.push(transformMessage(i))
+    }
+    result.data = messages
+    res.data = result
+    return Promise.resolve(res)
+  });
 }
 //queryMessagesOf(user_id, startFrom, limitation)
 Vue.prototype.queryMessagesOf = function (user_id, startFrom, limitation) {
@@ -644,7 +707,9 @@ Vue.prototype.queryFollowMessage = function (startFrom, limitation) {
     startFrom: startFrom,
     limitation: limitation
   }
+  console.log("132", )
   return post(MESSAGE + "queryFollowMessage", data).then(res => {
+    console.log(res)
     var message_infos = res.data.data
     if(!message_infos){
       return Promise.resolve(res);
@@ -765,16 +830,27 @@ var COMMENT = "api/comment/";
 Vue.prototype.queryComment = function (id, data) {
   return post(COMMENT + 'queryComments/' + id, data).then(res=>{
     if(res.data.data){
-      var tmp=new Object();
-      tmp.comment=transformComment(res.data.data.comment)
-      tmp.userPublicInfo=transformUserPublicInfo(res.data.data.userPublicInfo)
-      res.data.data=tmp;
+      for(let i = 0; i < res.data.data.length; i++){
+        var tmp=new Object();
+        console.log("transform前", res);
+        tmp.comment = transformComment(res.data.data)
+        tmp.userPublicInfo = transformUserPublicInfo(res.data.data)
+        console.log("transform得", tmp);
+        res.data.data[i] = tmp;
+      }
+      //res.data.data=tmp;
     }
+    //console.log("224", res);
+  
     return Promise.resolve(res)
   });
 }
-Vue.prototype.addComment = function (id, data) {
-  return post(COMMENT + 'add/' + id, data);
+Vue.prototype.addComment = function (data) {
+  let dataForward = {
+    messageId : data.message_id,
+    content : data.comment_content
+  }
+  return post(COMMENT + 'addComment/', dataForward);
 }
 
 
