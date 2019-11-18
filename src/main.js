@@ -223,7 +223,17 @@ function transformComment(res_data){
   data.comment_create_time=res_data.commentCreateTime
   return data;
 }
-
+function transfromContactPerson(res_data){
+  if(!res_data){
+    return null;
+  }
+  var data = new Object();
+  data.contact_person_id=res_data.userId
+  data.contact_nickname=res_data.userNickname
+  data.contact_time=res_data.UTIME
+  data.contact_person_avator_url=res_data.avatarUrl
+  return data;
+}
 ///////////////////////////////////////////
 //USER
 Vue.prototype.checkLogin = function () {
@@ -636,7 +646,17 @@ Vue.prototype.queryLatestContact = function (startFrom, limitation) {
     startFrom: startFrom,
     limitation: limitation
   }
-  return post(PRIVATE_LETTER + "queryLatestContact", data).then();
+  return post(PRIVATE_LETTER + "queryLatestContact", data).then(res => {
+    var contact_infos = res.data.data
+    var result = createResData(res.data)
+    var contact_persons = new Array()
+    for (var i of contact_infos) {
+      contact_persons.push(transfromContactPerson(i))
+    }
+    result.data = messages
+    res.data = result
+    return Promise.resolve(res)
+  });
 }
 ///api/PrivateLetter/querySpecified
 Vue.prototype.querySpecified = function (contact_id, startFrom, limitation) {
@@ -666,7 +686,7 @@ Vue.prototype.queryMessage = function (message_id) {
   if (!checkNumber(message_id)) {
     return null;
   }
-  return post(MESSAGE + "query?message_id=" + message_id).then(res => {
+  return post(MESSAGE + "queryMessage?message_id=" + message_id).then(res => {
     if (res.data.data) {
       var res_data = res.data.data
       res.data.data = transformMessage(res_data);
@@ -770,7 +790,7 @@ Vue.prototype.queryCollections = function (user_id, startFrom, limitation) {
     limitation: limitation
   }
   console.log("查看收藏：：：：" + COLLECTION + "query/" + user_id)
-  return post(COLLECTION + "query/" + user_id, data).then(res => {
+  return post(COLLECTION + "queryCollection/" + user_id, data).then(res => {
     var message_infos = res.data.data
     var result = createResData(res.data)
     var messages = new Array()
