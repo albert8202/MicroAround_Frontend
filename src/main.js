@@ -671,7 +671,7 @@ Vue.prototype.queryMessage = function (message_id) {
   if (!checkNumber(message_id)) {
     return null;
   }
-  return post(MESSAGE + "query?message_id=" + message_id).then(res => {
+  return post(MESSAGE + "queryMessage?message_id=" + message_id).then(res => {
     if (res.data.data) {
       var res_data = res.data.data
       res.data.data = transformMessage(res_data);
@@ -776,7 +776,7 @@ Vue.prototype.queryCollections = function (user_id, startFrom, limitation) {
     limitation: limitation
   }
   console.log("查看收藏：：：：" + COLLECTION + "query/" + user_id)
-  return post(COLLECTION + "query/" + user_id, data).then(res => {
+  return post(COLLECTION + "queryCollection/" + user_id, data).then(res => {
     var message_infos = res.data.data
     var result = createResData(res.data)
     var messages = new Array()
