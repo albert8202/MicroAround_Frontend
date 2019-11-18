@@ -91,7 +91,7 @@
                 desc:''
               })
               this.$router.push("/index");
-              this.delCookie('userID')
+              this.delCookie('userId')
               return
             }
             else{

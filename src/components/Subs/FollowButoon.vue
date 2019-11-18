@@ -101,14 +101,14 @@ export default {
     },
     isShow(){
       var _this = this;
-      return this.getCookies("userID").then(userID => {
-        if(userID && _this.visitor && userID.toString() != _this.visitor.toString()){
+      return this.getCookies("userId").then(userId => {
+        if(userId && _this.visitor && userId.toString() != _this.visitor.toString()){
           return true;
         }else{
           return false;
         }
       });
-      // if(this.getCookie('userID')&&this.visitor&&this.getCookie('userID').toString()!=this.visitor.toString()){
+      // if(this.getCookie('userId')&&this.visitor&&this.getCookie('userId').toString()!=this.visitor.toString()){
       //   return true;
       // }else{
       //   return false;

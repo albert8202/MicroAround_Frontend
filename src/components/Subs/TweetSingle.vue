@@ -148,7 +148,7 @@
             <usermessage
               style="float:right;margin-right: 10px"
               v-bind:userId="item.message_sender_user_id"
-              v-if="myUserId != item.message_sender_user_id"
+              v-if="myuserId != item.message_sender_user_id"
             ></usermessage>
           </div>
         </div>
@@ -272,7 +272,7 @@
             <usermessage
               style="float:right;margin-right: 10px"
               v-bind:userId="item.message_sender_user_id"
-              v-if="item.message_sender_user_id == myUserId"
+              v-if="item.message_sender_user_id == myuserId"
             ></usermessage>
           </div>
         </div>
@@ -376,7 +376,7 @@ export default {
       userName:"user",
       rawItemUserAvt: "",
       rawItemUserName: "",
-      myUserId : 0,
+      myuserId : 0,
     };
   },
   methods: {
@@ -386,10 +386,10 @@ export default {
     },
     ifBeMyTwi() {
       var _this = this;
-      return this.getCookies("userID").then(userID => {
-        return _this.item.message_sender_user_id == userID;
+      return this.getCookies("userId").then(userId => {
+        return _this.item.message_sender_user_id == userId;
       })
-      // if (this.item.message_sender_user_id == this.getCookies("userID")) {
+      // if (this.item.message_sender_user_id == this.getCookies("userId")) {
       //   return true;
       // } else {
       //   return false;
@@ -486,8 +486,8 @@ export default {
         if (Response.data.message == "success") {
           this.commentsNum += 1;
           this.commented = true;
-          this.getCookies("userID").then(userID => {
-            this.getUserPublicInfo(userID).then(Response => {
+          this.getCookies("userId").then(userId => {
+            this.getUserPublicInfo(userId).then(Response => {
             let timeObj = new Date();
             if (Response.data.message == "success") {
               let commTemp = {
@@ -527,38 +527,38 @@ export default {
   },
   created() {
     var _this = this;
-    this.getCookies("userID").then(userID => {
-      _this.myUserId = userID;
+    this.getCookies("userId").then(userId => {
+      _this.myuserId = userId;
     });
     this.collectByUser = this.item.collectByUser;
     this.likeByUser = this.item.likeByUser;
     this.followByUser = this.item.followByUser;
     this.commentsNum = this.item.message_comment_num;
     //求证是否点赞收藏关注
-    this.getCookies("userID").then(userID => {
+    this.getCookies("userId").then(userId => {
       _this.checkUserLikesMessage(
-        userID,
+        userId,
         _this.item.message_id
       ).then(Response => {
         console.log("609", Response);
         _this.likeByUser = Response.data.data.like;
       });
       _this.checkUserCollectMessage(
-        userID,
+        userId,
         _this.item.message_id
       ).then(Response => {
         _this.collectByUser = Response.data.data.favor;
     });
     })
     // this.checkUserLikesMessage(
-    //   this.getCookies("userID"),
+    //   this.getCookies("userId"),
     //   this.item.message_id
     // ).then(Response => {
     //   console.log("609", Response);
     //   this.likeByUser = Response.data.data.like;
     // });
     // this.checkUserCollectMessage(
-    //   this.getCookies("userID"),
+    //   this.getCookies("userId"),
     //   this.item.message_id
     // ).then(Response => {
     //   this.collectByUser = Response.data.data.favor;
@@ -570,8 +570,8 @@ export default {
         //获取以上的数据，这里由于可能是第二次拿数据，因此i+twiCount才是当前要处理的推的索引
     this.getUserPublicInfo(this.item.message_sender_user_id).then(
       Response => {
-        this.userName = Response.data.data.nickname;
         console.log("601" , this.item ,Response);
+        this.userName = Response.data.data.nickname;
         this.userAvt = Response.data.data.avatar_url;
 
       }

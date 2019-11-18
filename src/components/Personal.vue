@@ -360,7 +360,7 @@ export default {
   },
   created(){
     // var _this = this
-    // var user_id = _this.getCookies("userID");
+    // var user_id = _this.getCookies("userId");
     // console.log(user_id);
     // this.user_id = user_id;
     // this.uploadList = this.$refs.upload.fileList;
@@ -380,7 +380,7 @@ export default {
   },
   mounted() {
     var _this = this
-    _this.getCookies("userID").then(user_id => {
+    _this.getCookies("userId").then(user_id => {
       console.log(user_id);
       _this.user_id = user_id;
       _this.uploadList = _this.$refs.upload.fileList;
@@ -525,7 +525,7 @@ export default {
   },
   beforeRouteEnter(to,from,next){
       next(vm=>{
-        vm.getCookie("userID").then(res => {
+        vm.getCookie("userId").then(res => {
           if(!res){
             console.log("请先登录")
             vm.$router.push("index")

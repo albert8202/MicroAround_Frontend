@@ -190,13 +190,13 @@ export default {
   },
   created() {
     var _this = this;
-    this.getCookies("userID").then(userID => {
-      if(!userID){
+    this.getCookies("userId").then(userId => {
+      if(!userId){
         console.log("需要登录");
         _this.$router.push("index");
         return;
       }
-      this.getUserPublicInfo(userID).then(response => {
+      this.getUserPublicInfo(userId).then(response => {
         _this.my_user_info = response.data.data;
       })
     })
@@ -273,7 +273,7 @@ export default {
   },
   beforeRouteEnter(to, from, next) {
     next(vm => {
-      vm.getCookie("userID").then(res => {
+      vm.getCookie("userId").then(res => {
           if(!res){
             console.log("请先登录")
             vm.$router.push("index")

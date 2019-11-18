@@ -254,7 +254,7 @@ ul li{
         video_preview_src:"",
         uploadList: [],
         loading:true,
-        userID: null,
+        userId: null,
         format:['jpg','jpeg','png','mp4'],
         sites: [
           { name: 'Runoob' },
@@ -277,17 +277,17 @@ ul li{
     },
     mounted() {
     var _this = this;
-    _this.getCookie("userID").then(res => {
-      var userID = res;
+    _this.getCookie("userId").then(res => {
+      var userId = res;
       if(!res){
         console.log("1046", res);
         this.$router.push("index");
       }
-      console.log("登录：", userID)
-      _this.userID = userID;
-      console.log(userID)
+      console.log("登录：", userId)
+      _this.userId = userId;
+      console.log(userId)
       _this.uploadList = _this.$refs.upload.fileList;
-      _this.getUserPublicInfo(userID).then(Response=>{
+      _this.getUserPublicInfo(userId).then(Response=>{
         console.log(Response)
         if(Response.data.code==200 && Response.data.message=="success"){
           _this.address = Response.data.data.avatar_url
@@ -487,7 +487,7 @@ ul li{
     },
     beforeRouteEnter(to,from,next){
       next(vm=>{
-        vm.getCookie("userID").then(res => {
+        vm.getCookie("userId").then(res => {
           if(!res){
             console.log("请先登录")
             vm.$router.push("index")

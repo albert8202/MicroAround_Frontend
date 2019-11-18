@@ -1,8 +1,8 @@
-var userID
+var userId
 var visitID
 export default{
    data:{
-       userID,
+       userId,
        visitID
    }
 }

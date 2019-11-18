@@ -34,21 +34,31 @@ Vue.prototype.getCookie = function (name) {
   //   return Vue.prototype.userId
   // }
   // return null;
-  // var res = get_sync("/api/user/getUserId");
+  // var res = get_sync("/api/user/getuserId");
   // console.log("523", res)
   // return res.data.data==0?null:res.data.data;
-  var cookieInBrowser = Vue.prototype.getCookieInBrowser(name);
-  if(cookieInBrowser){
-    return Vue.prototype.checkLogin().then(res => {
-      console.log("getCookie", res);
-      if(res.data.message === "Need Authentication"){
-        Vue.prototype.delCookie("userID");
-        return Promise.resolve(null);
-      }
-      return Promise.resolve(cookieInBrowser);
-    })
-  }
-  return Promise.resolve(null);
+
+  return get("api/user/getCookieContent/" + name).then(res => {
+    console.log("1047", res);
+    if(res.data.data){
+      return Promise.resolve(res.data.data);
+    }
+    return Promise.resolve(null);
+  });
+
+
+  // var cookieInBrowser = Vue.prototype.getCookieInBrowser(name);
+  // if(cookieInBrowser){
+  //   return Vue.prototype.checkLogin().then(res => {
+  //     console.log("getCookie", res);
+  //     if(res.data.message === "Need Authentication"){
+  //       Vue.prototype.delCookie("userId");
+  //       return Promise.resolve(null);
+  //     }
+  //     return Promise.resolve(cookieInBrowser);
+  //   })
+  // }
+  // return Promise.resolve(null);
 }
 //删除cookies
 Vue.prototype.delCookie = function (name) {
@@ -88,10 +98,15 @@ function post(url, data) {
     url: "http://localhost:8008/" + url,
     //url: url,
     data: data,
+    withCredentials : true
   })
 }
 function get(url) {
-  return axios.get("http://localhost:8008/" + url);
+  return axios({
+    method: "GET",
+    url: "http://localhost:8008/" + url,
+    withCredentials: true
+  });
 }
 
 function get_sync(url) {
@@ -157,14 +172,14 @@ function transformMessage(res_data) {
   data.message_content = res_data.messageContent
   data.message_create_time = res_data.messageCreateTime
   data.message_like_num = res_data.messageAgreeNum
-  data.message_transpond_num= res_data.messageTranspondNum
+  data.message_transpond_num= res_data.messageTranspondNum ? res_data.messageTranspondNum : 0;
   data.message_comment_num = res_data.messageCommentNum
   data.message_view_num = res_data.messageViewNum
   data.message_has_image = res_data.messageHasImage
   data.message_sender_user_id = res_data.messageSenderUserId
   data.message_heat = res_data.messageHeat
-  data.message_image_count = res_data.messageImageCount;
-  data.message_transpond_message_id = res_data.messageTranspondMessageId;
+  data.message_image_count = res_data.messageImageCount ? res_data.messageImageCount : 0;
+  data.message_transpond_message_id = res_data.messageTranspondMessageId ? res_data.messageTranspondMessageId : null;
   data.message_topics = res_data.messageTopics;
   data.message_ats = res_data.messageAts;
   data.message_image_urls = res_data.messageImageUrls;
@@ -707,9 +722,8 @@ Vue.prototype.queryFollowMessage = function (startFrom, limitation) {
     startFrom: startFrom,
     limitation: limitation
   }
-  console.log("132", )
   return post(MESSAGE + "queryFollowMessage", data).then(res => {
-    console.log(res)
+    console.log("132", res)
     var message_infos = res.data.data
     if(!message_infos){
       return Promise.resolve(res);

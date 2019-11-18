@@ -471,14 +471,14 @@ export default {
     //tmd 参观者还是被参观者啊到底。。。。。。
     this.visitor = Number(this.$route.query.visitor_id);
     //user到底是什么鬼
-    this.getCookies("userID").then(userID => {
-      if(!userID){
+    this.getCookies("userId").then(userId => {
+      if(!userId){
         _this.$router.push("index");
         return;
       }
-      _this.user = userID;
-      console.log("user", userID);
-      _this.getUserPublicInfo(userID).then(response => {
+      _this.user = userId;
+      console.log("user", userId);
+      _this.getUserPublicInfo(userId).then(response => {
         _this.my_info = response.data.data;
       });
     });
@@ -599,7 +599,7 @@ export default {
       if (this.$refs.twe2) {
         this.$refs.twe2.change_follow2(event[0], event[1]);
       }
-      if (this.visitor == this.getCookie("userID")) {
+      if (this.visitor == this.getCookie("userId")) {
         var k = [];
         for (var i = 0; i < this.followingList.length; ++i) {
           if (this.followingList[i].user_id.toString() != event[1].toString()) {
@@ -650,7 +650,7 @@ export default {
     }
   },
   watch: {
-    "$route.params.PersonAccount": "initUserID",
+    "$route.params.PersonAccount": "inituserId",
     isFollowing(val) {
       /*if (this.$refs.twe1) {
         this.$refs.twe1.change_follow2(val, this.visitor);
@@ -663,7 +663,7 @@ export default {
   },
   beforeRouteEnter(to,from,next){
       next(vm=>{
-        vm.getCookie("userID").then(res => {
+        vm.getCookie("userId").then(res => {
             if(!res){
               console.log("请先登录")
               vm.$router.push("index")

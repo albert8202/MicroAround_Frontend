@@ -95,10 +95,10 @@ export default {
               desc:''
             })
             var i = Response.data.data.user_id
-            //User.userID = i;
-            //console.log(User.userID)
+            //User.userId = i;
+            //console.log(User.userId)
             //加入coockie
-            _this.setCookie("userID", i, 30)
+            _this.setCookie("userId", i, 30)
             console.log(document.cookie)
             _this.$router.push("/home");
           }
@@ -132,7 +132,7 @@ export default {
   },
   beforeRouteEnter(to,from,next){
       next(vm=>{
-        vm.getCookie("userID").then(res => {
+        vm.getCookie("userId").then(res => {
           if(res){
             console.log("已经登录")
             vm.$router.push("home")

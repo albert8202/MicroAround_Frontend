@@ -43,7 +43,7 @@
       },
       beforeRouteEnter(to,from,next){
         next(vm=>{
-          vm.getCookie("userID").then(res => {
+          vm.getCookie("userId").then(res => {
             if(!res){
               console.log("请先登录")
               vm.$router.push("index")

@@ -1,7 +1,7 @@
 <template>
   <div id="left-container">
     <ElContainer id="left-container1" style="background-color:#1DA1F2;">
-      <router-link :to="{ path: '/Zoom', query: { visitor_id: userID}}">
+      <router-link :to="{ path: '/Zoom', query: { visitor_id: userId}}">
       <div style="float:left;margin-left:20px; margin-top:50px;">
       <Avatar
         v-bind:src="address"
@@ -102,16 +102,16 @@ export default {
       topics: undefined,
       address: "/upload/avatar/0",
       userName:"userName",
-      userID:"0"
+      userId:"0"
     };
   },
   mounted() {
     var _this = this;
-    _this.getCookies("userID").then(userID => {
-      _this.userID = userID;
-      console.log("登录：", _this.userID)
-      console.log(_this.userID)
-      _this.getUserPublicInfo(_this.userID).then(Response=>{
+    _this.getCookies("userId").then(userId => {
+      _this.userId = userId;
+      console.log("登录：", _this.userId)
+      console.log(_this.userId)
+      _this.getUserPublicInfo(_this.userId).then(Response=>{
         console.log(Response)
         if(Response.data.code==200 && Response.data.message=="success"){
           _this.userName = Response.data.data.nickname
