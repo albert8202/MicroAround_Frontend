@@ -254,6 +254,7 @@ ul li{
         video_preview_src:"",
         uploadList: [],
         loading:true,
+        userID: null,
         format:['jpg','jpeg','png','mp4'],
         sites: [
           { name: 'Runoob' },
@@ -276,23 +277,29 @@ ul li{
     },
     mounted() {
     var _this = this;
-    var userID = _this.getCookie("userID")
-    console.log("登录：", userID)
-    console.log(userID)
-    this.uploadList = this.$refs.upload.fileList;
-    this.getUserPublicInfo(userID).then(Response=>{
-    console.log(Response)
-    if(Response.data.code==200 && Response.data.message=="success")
-      {
-
-        this.address = Response.data.data.avatar_url
-        console.log(this.userName)
+    _this.getCookie("userID").then(res => {
+      var userID = res;
+      if(!res){
+        console.log("1046", res);
+        this.$router.push("index");
       }
-      else{
-        console.log("fail")
-        this.userName="userName"
-      }  
+      console.log("登录：", userID)
+      _this.userID = userID;
+      console.log(userID)
+      _this.uploadList = _this.$refs.upload.fileList;
+      _this.getUserPublicInfo(userID).then(Response=>{
+        console.log(Response)
+        if(Response.data.code==200 && Response.data.message=="success"){
+          _this.address = Response.data.data.avatar_url
+          console.log(_this.userName)
+        }
+        else{
+          console.log("fail")
+          _this.userName="userName"
+        }  
+      });
     })
+  
     },
     methods:{
       stop_loading(){
@@ -452,6 +459,7 @@ ul li{
       formData.append("message_content", this.editor_content);
       formData.append("message_has_image", this.uploadList.length > 0 ? 1 : 0);
       formData.append("message_image_count", this.uploadList.length);
+      var files = [];
       for(let i = 0; i < this.uploadList.length; i++){
         formData.append("file"+i, this.uploadList[i]);
       }
@@ -479,11 +487,13 @@ ul li{
     },
     beforeRouteEnter(to,from,next){
       next(vm=>{
-        if(!vm.getCookie("userID"))
-        {
-          console.log("请先登录")
-          vm.$router.push("index")
-        }
+        vm.getCookie("userID").then(res => {
+          if(!res){
+            console.log("请先登录")
+            vm.$router.push("index")
+          }
+
+        });
       })
     }
   }

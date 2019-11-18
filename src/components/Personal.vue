@@ -272,7 +272,7 @@ export default {
       uploadList: [],
       visible: false,
       img_preview: "",
-      img_src: "/avatars/0.jpg",
+      img_src: "/avatars/0",
       defaultList: [
         {
           name: "a42bdcc1178e62b4694c830f028db5c0",
@@ -380,24 +380,25 @@ export default {
   },
   mounted() {
     var _this = this
-    var user_id = _this.getCookies("userID");
-    console.log(user_id);
-    this.user_id = user_id;
-    this.uploadList = this.$refs.upload.fileList;
-    console.log(this.formValidate);
-    _this.getUserPublicInfo(this.user_id).then(response => {
-      console.log(response);
-    });
-    _this.getUserAllInfo().then(response => {
-      console.log("获取用户全部信息", response);
-      var user_info = response.data.data;
-      _this.formValidate.alias = user_info.userPublicInfo.nickname;
-      _this.formValidate.name = user_info.user_Private_Info.user_realname;
-      _this.formValidate.gender = user_info.user_Private_Info.user_gender;
-      _this.formValidate.desc = user_info.userPublicInfo.self_introction;
-      _this.uploadList.push({
-        url: user_info.userPublicInfo.avatar_url,
-        dont_upload: true
+    _this.getCookies("userID").then(user_id => {
+      console.log(user_id);
+      _this.user_id = user_id;
+      _this.uploadList = _this.$refs.upload.fileList;
+      console.log(_this.formValidate);
+      _this.getUserPublicInfo(_this.user_id).then(response => {
+        console.log(response);
+      });
+      _this.getUserAllInfo().then(response => {
+        console.log("获取用户全部信息", response);
+        var user_info = response.data.data;
+        _this.formValidate.alias = user_info.userPublicInfo.nickname;
+        _this.formValidate.name = user_info.user_Private_Info.user_realname;
+        _this.formValidate.gender = user_info.user_Private_Info.user_gender;
+        _this.formValidate.desc = user_info.userPublicInfo.self_introction;
+        _this.uploadList.push({
+          url: user_info.userPublicInfo.avatar_url,
+          dont_upload: true
+        });
       });
     });
   },
@@ -524,11 +525,12 @@ export default {
   },
   beforeRouteEnter(to,from,next){
       next(vm=>{
-        if(!vm.getCookie("userID"))
-        {
-          console.log("请先登录")
-          vm.$router.push("index")
-        }
+        vm.getCookie("userID").then(res => {
+          if(!res){
+            console.log("请先登录")
+            vm.$router.push("index")
+          }
+        });
       })
     }
 };

@@ -37,7 +37,7 @@ export default {
         self_introduction: "",
         followers_num: 0,
         follows_num: 0,
-        avatar_url: "/avatars/0.jpg",
+        avatar_url: "/avatars/0",
         messages_num: 0,
         collection_num: 0
       },

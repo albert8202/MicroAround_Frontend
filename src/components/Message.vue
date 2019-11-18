@@ -190,9 +190,16 @@ export default {
   },
   created() {
     var _this = this;
-    this.getUserPublicInfo(this.getCookies("userID")).then(response => {
-      _this.my_user_info = response.data.data;
-    });
+    this.getCookies("userID").then(userID => {
+      if(!userID){
+        console.log("需要登录");
+        _this.$router.push("index");
+        return;
+      }
+      this.getUserPublicInfo(userID).then(response => {
+        _this.my_user_info = response.data.data;
+      })
+    })
   },
   mounted() {
     this.queryLatestContact(1, 10).then(response => {
@@ -266,10 +273,12 @@ export default {
   },
   beforeRouteEnter(to, from, next) {
     next(vm => {
-      if (!vm.getCookie("userID")) {
-        console.log("请先登录");
-        vm.$router.push("index");
-      }
+      vm.getCookie("userID").then(res => {
+          if(!res){
+            console.log("请先登录")
+            vm.$router.push("index")
+          }
+      });
     });
   }
 };

@@ -89,7 +89,7 @@ img{
 
 <div>
     <Modal title="Preview" v-model="visible">
-      <img style="width: 100%"   v-if="previewSrc.split('.')[1] == 'jpg' " v-bind:src="previewSrc" />
+      <img style="width: 100%"   v-if="previewSrc.split('.')[1] == 'image' " v-bind:src="previewSrc" />
       <video
         style="width: 100%"
         v-else
@@ -281,7 +281,7 @@ export default {
         }
     },
     mounted(){
-        if (this.imgData&&this.imgData.length){
+        if (this.imgData && this.imgData.length){
                 this.imgNum=this.imgData.length;
                 this.handlerWidth=this.$refs.wholediv.offsetWidth;
                 if (this.imgData.length==1){
@@ -298,9 +298,11 @@ export default {
             }
             console.log("mount里",this.handlerHeight);
             console.log("推特的圖片列表", this.twiId, this.imgData);
-            if(this.imgData[0].split(".")[1] == "jpg"){
+            if(this.imgData[0].split(".")[1] == "image"){
+              console.log("不是视频");
               this.is_video = false;
             }else{
+              console.log("是视频")
               this.is_video = true;
             }
         }

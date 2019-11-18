@@ -48,6 +48,9 @@ export default {
     }
   },
   methods: {
+    getCookies(a){
+      return this.getCookie(a);
+    },
     unfollowClick() {
       this.$emit("update:isFollowing", false);
       this.$emit("update:followerCount", this.followerCount - 1);
@@ -97,11 +100,19 @@ export default {
         return this.isFollowing ? "unfollow" : "follow";
     },
     isShow(){
-      if(this.getCookie('userID')&&this.visitor&&this.getCookie('userID').toString()!=this.visitor.toString()){
-        return true;
-      }else{
-        return false;
-      }
+      var _this = this;
+      return this.getCookies("userID").then(userID => {
+        if(userID && _this.visitor && userID.toString() != _this.visitor.toString()){
+          return true;
+        }else{
+          return false;
+        }
+      });
+      // if(this.getCookie('userID')&&this.visitor&&this.getCookie('userID').toString()!=this.visitor.toString()){
+      //   return true;
+      // }else{
+      //   return false;
+      // }
     }
   }
 };

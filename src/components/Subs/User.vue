@@ -29,7 +29,7 @@ export default {
         self_introduction: "",
         followers_num: 0,
         follows_num: 0,
-        avatar_url: "/upload/avatar/0",
+        avatar_url: "/avatars/0",
         messages_num: 0,
         collection_num: 0,
       },
@@ -48,7 +48,6 @@ export default {
         if (Response.data.message == "success") {
           this.load_info(Response.data.data);
           console.log("user_id:"+user_id);
-          console.log("411");
           console.log(Response.data);
         }
       });

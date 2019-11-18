@@ -50,7 +50,7 @@ export default {
     },
     data(){
         return {
-            url:"http://localhost:12293/"
+            url:"http://localhost:8008/"
         }
     },
     computed:{
@@ -65,20 +65,21 @@ export default {
     methods:{
         parseTwitter(twitter_content){
             // ats[i] {atName, atIds} topics[i] {topicId, topicName}
-            twitter_content;
+            console.log("推特内容：100", twitter_content);
             var topics = this.topics;
             var ats = this.ats;
-            //console.log("解析前", topics, ats)
+            console.log("解析前", topics, ats)
             for(let i = 0; i < ats.length; i++){
-                var re = new RegExp(ats[i].atName, "g");
+                var re = new RegExp("@" + ats[i].atName, "g");
                 var atNameTripped = ats[i].atName;
-                twitter_content = twitter_content.replace(re, ' <a href="/Zoom?visitor_id='+ ats[i].atIds + '" > ' + atNameTripped + ' </a> ');
+                twitter_content = twitter_content.replace(re, ' <a href="/Zoom?visitor_id='+ ats[i].atIds + '" > @' + atNameTripped + ' </a> ');
             }
             for(let i = 0; i < topics.length; i++){
-                var re = new RegExp(topics[i].topicName, "g");
-                var topicNameTripped = topics[i].topicName.split("#")[1];
+                var re = new RegExp("#" + topics[i].topicName + "#", "g");
+                var topicNameTripped = topics[i].topicName;
                 twitter_content = twitter_content.replace(re, ' <a href="/Topic?topic_id='+ topics[i].topicId + '&topic_name=' + topicNameTripped + '" > #' + topicNameTripped + '# </a> ');
             }
+            console.log("102", twitter_content);
             return twitter_content;
         },
         doAtToUserHome(text){

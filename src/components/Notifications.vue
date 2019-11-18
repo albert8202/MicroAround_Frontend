@@ -95,11 +95,12 @@ export default {
   },
   beforeRouteEnter(to,from,next){
       next(vm=>{
-        if(!vm.getCookie("userID"))
-        {
-          console.log("请先登录")
-          vm.$router.push("index")
-        }
+        vm.getCookie("userID").then(res => {
+          if(!res){
+            console.log("请先登录")
+            vm.$router.push("index")
+          }
+        });
       })
     }
 };

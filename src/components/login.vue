@@ -79,17 +79,18 @@ export default {
           email: this.email,
           password: this.password
         }
+        var _this = this;
         this.signIn(data).then(Response=>{
           console.log(Response);
           if(Response.data.code==200 && Response.data.message=="success" && Response.data.data.user_id!=0)
           {
-            this.checkLogin().then(Response=>{
+            _this.checkLogin().then(Response=>{
               console.log('aa',Response)
             })
             //成功
             //this.errHint="Success!";
-            this.loading=false
-            this.$Notice.success({
+            _this.loading=false
+            _this.$Notice.success({
               title: 'Login Success!',
               desc:''
             })
@@ -97,27 +98,27 @@ export default {
             //User.userID = i;
             //console.log(User.userID)
             //加入coockie
-            this.setCookie("userID", i, 30)
+            _this.setCookie("userID", i, 30)
             console.log(document.cookie)
-            this.$router.push("/home");
+            _this.$router.push("/home");
           }
           else if(Response.data.code==200 && Response.data.data.user_id==0)
           {
             //失败
-            this.loading=false
-            this.$Notice.error({
+            _this.loading=false
+            _this.$Notice.error({
               title: 'E-mail or Password Wrong.',
               desc:''
             })
-            this.errHint="E-mail or Password is Wrong!"
+            _this.errHint="E-mail or Password is Wrong!"
           }
           else{
-            this.loading=false
-            this.$Notice.error({
+            _this.loading=false
+            _this.$Notice.error({
               title: "You have already loged in.",
               desc:''
             })
-            this.errHint="You have already loged in."
+            _this.errHint="You have already loged in."
           }
         });
       } catch (e) {
@@ -131,11 +132,12 @@ export default {
   },
   beforeRouteEnter(to,from,next){
       next(vm=>{
-        if(vm.getCookie("userID"))
-        {
-          console.log("请先登出")
-          vm.$router.push("home")
-        }
+        vm.getCookie("userID").then(res => {
+          if(res){
+            console.log("已经登录")
+            vm.$router.push("home")
+          }
+        });
       })
     }
 }

@@ -109,6 +109,7 @@ export default {
           this.items.length + 1,
           10
         ).then(Response => {
+          console.log("159", Response);
           this.$emit("stop_loading");
           this.twiDatas = Response.data.data;
           //console.log(this.twiDatas);
