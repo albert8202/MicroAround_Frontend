@@ -611,6 +611,7 @@ Vue.prototype.queryForMe = function (startFrom, limitation) {
     limitation: limitation
   }
   return post(PRIVATE_LETTER + "queryForMe", data).then(res => {
+    console.log("测试私信")
     var letter_infos = res.data.data
     var result = createResData(res.data)
     var letters = new Array()
@@ -629,16 +630,16 @@ Vue.prototype.sendPrivateLetter = function (user_id, content) {
     return null;
   }
   var data = {
-    private_letter_content: content
+    content
   }
-  return post(PRIVATE_LETTER + "send/" + user_id, data);
+  return post(PRIVATE_LETTER + "addPrivateLetter/" + user_id, data);
 }
 //deletePrivateLetter(private_letter_id)
 Vue.prototype.deletePrivateLetter = function (private_letter_id) {
   if (!checkNumber(private_letter_id)) {
     return null;
   }
-  return get(PRIVATE_LETTER + "delete/" + private_letter_id);
+  return get(PRIVATE_LETTER + "deletePrivateLetter/" + private_letter_id);
 }
 ///api/PrivateLetter/queryLatestContact(startForm, limitation)
 Vue.prototype.queryLatestContact = function (startFrom, limitation) {
@@ -653,7 +654,7 @@ Vue.prototype.queryLatestContact = function (startFrom, limitation) {
     for (var i of contact_infos) {
       contact_persons.push(transfromContactPerson(i))
     }
-    result.data = messages
+    result.data = contact_persons
     res.data = result
     return Promise.resolve(res)
   });
@@ -671,7 +672,9 @@ Vue.prototype.querySpecified = function (contact_id, startFrom, limitation) {
     for (var i of letter_infos) {
       letters.push(transfromPrivateLetter(i))
     }
-    result.data = messages
+    console.log(letters)
+    console.log(letter_infos)
+    result.data = letters
     res.data = result
     return Promise.resolve(res)
   });
@@ -875,7 +878,7 @@ Vue.prototype.queryComment = function (id, data) {
       //res.data.data=tmp;
     }
     //console.log("224", res);
-  
+
     return Promise.resolve(res)
   });
 }

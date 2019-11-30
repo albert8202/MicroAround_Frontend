@@ -105,14 +105,16 @@ export default {
     },
     methods:{
         //转发
-        message(){ 
+        message(){
             let data={
                 private_letter_content:this.text,
             }
+            console.log("给老子发")
             this.sendPrivateLetter(this.userId,this.text
             ).then(Response=>{
             //成功发送了
-                if (Response.data.code==200){
+              console.log("成功发送");
+              if (Response.data.code==200){
                     //播放动画？
                     this.$Notice.success({
               title: 'Send message success!',
@@ -141,11 +143,11 @@ export default {
             this.showPage=false;
             this.text='';
         },
-        
+
     },
     created(){
-           
+
     }
-    
-}   
+
+}
 </script>
