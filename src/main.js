@@ -167,6 +167,8 @@ function transformMessage(res_data) {
   if(!res_data){
     return null;
   }
+  console.log("data content", res_data.messageContent);
+  console.log("data", res_data);
   var data = new Object();
   data.message_id = res_data.messageId
   data.message_content = res_data.messageContent
@@ -179,7 +181,7 @@ function transformMessage(res_data) {
   data.message_sender_user_id = res_data.messageSenderUserId
   data.message_heat = res_data.messageHeat
   data.message_image_count = res_data.messageImageCount ? res_data.messageImageCount : 0;
-  data.message_transpond_message_id = res_data.messageTranspondMessageId ? res_data.messageTranspondMessageId : null;
+  data.message_transpond_message_id = res_data.transpondedMessageId ? res_data.transpondedMessageId : null;
   data.message_topics = res_data.messageTopics;
   data.message_ats = res_data.messageAts;
   data.message_image_urls = res_data.messageImageUrls;
@@ -628,10 +630,7 @@ Vue.prototype.sendPrivateLetter = function (user_id, content) {
   if (!checkNumber(user_id) || !checkString(content)) {
     return null;
   }
-  var data = {
-    private_letter_content: content
-  }
-  return post(PRIVATE_LETTER + "send/" + user_id, data);
+  return post(PRIVATE_LETTER + "send/" + user_id + "?content=" + content);
 }
 //deletePrivateLetter(private_letter_id)
 Vue.prototype.deletePrivateLetter = function (private_letter_id) {
@@ -653,7 +652,7 @@ Vue.prototype.queryLatestContact = function (startFrom, limitation) {
     for (var i of contact_infos) {
       contact_persons.push(transfromContactPerson(i))
     }
-    result.data = messages
+    result.data = contact_persons
     res.data = result
     return Promise.resolve(res)
   });
@@ -671,7 +670,7 @@ Vue.prototype.querySpecified = function (contact_id, startFrom, limitation) {
     for (var i of letter_infos) {
       letters.push(transfromPrivateLetter(i))
     }
-    result.data = messages
+    result.data = letters;
     res.data = result
     return Promise.resolve(res)
   });
@@ -724,7 +723,7 @@ Vue.prototype.queryMessagesOf = function (user_id, startFrom, limitation) {
     startFrom: startFrom,
     limitation: limitation
   }
-  return post(MESSAGE + "queryMessage/" + user_id, data).then(res => {
+  return post(MESSAGE + "queryUserMessage/" + user_id, data).then(res => {
     var message_infos = res.data.data
     var result = createResData(res.data)
     var messages = new Array()
@@ -765,6 +764,7 @@ Vue.prototype.sendMessage = function (formData) {
 //transpond(formData: {message_content, message_source_is_transpond, message_transpond_message_id})
 // 文字内容， 将要转发的推特是否也是转发的推特， 将要转发的推特的id
 Vue.prototype.transpond = function transpond(formData) {
+  console.log("119", formData);
   return post(MESSAGE + "transpond", formData);
 }
 //deleteMessage(message_id)
@@ -799,6 +799,7 @@ Vue.prototype.queryCollections = function (user_id, startFrom, limitation) {
     }
     result.data = messages
     res.data = result
+    console.log("1230", res);
     return Promise.resolve(res)
   });
 }
@@ -842,6 +843,7 @@ Vue.prototype.queryAtMe = function (startFrom, limitation) {
     limitation: limitation
   }
   return post(AT + "query", data).then(res => {
+    console.log("221", res);
     var message_infos = res.data.data
     var result = createResData(res.data)
     var messages = new Array()
@@ -863,12 +865,12 @@ Vue.prototype.queryUnreadAt = function () {
 var COMMENT = "api/comment/";
 Vue.prototype.queryComment = function (id, data) {
   return post(COMMENT + 'queryComments/' + id, data).then(res=>{
+    console.log("1222", res);
     if(res.data.data){
       for(let i = 0; i < res.data.data.length; i++){
         var tmp=new Object();
-        console.log("transform前", res);
-        tmp.comment = transformComment(res.data.data)
-        tmp.userPublicInfo = transformUserPublicInfo(res.data.data)
+        tmp.comment = transformComment(res.data.data[i])
+        tmp.userPublicInfo = transformUserPublicInfo(res.data.data[i])
         console.log("transform得", tmp);
         res.data.data[i] = tmp;
       }

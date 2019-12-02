@@ -64,7 +64,7 @@ export default {
     },
     methods:{
         parseTwitter(twitter_content){
-            // ats[i] {atName, atIds} topics[i] {topicId, topicName}
+            // ats[i] {atName, atId} topics[i] {topicId, topicName}
             console.log("推特内容：100", twitter_content);
             var topics = this.topics;
             var ats = this.ats;
@@ -72,7 +72,7 @@ export default {
             for(let i = 0; i < ats.length; i++){
                 var re = new RegExp("@" + ats[i].atName, "g");
                 var atNameTripped = ats[i].atName;
-                twitter_content = twitter_content.replace(re, ' <a href="/Zoom?visitor_id='+ ats[i].atIds + '" > @' + atNameTripped + ' </a> ');
+                twitter_content = twitter_content.replace(re, ' <a href="/Zoom?visitor_id='+ ats[i].atId + '" > @' + atNameTripped + ' </a> ');
             }
             for(let i = 0; i < topics.length; i++){
                 var re = new RegExp("#" + topics[i].topicName + "#", "g");

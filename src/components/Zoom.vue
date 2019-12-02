@@ -338,7 +338,7 @@ bottom:0;
           
 
           <!--display tweets-->
-          <div v-if="navStatus.tweetsShow" id="tweets-container">
+          <div v-show="navStatus.tweetsShow" id="tweets-container">
             <tweets
               @stop_loading="stop_loading"
               :ref="'twe1'"

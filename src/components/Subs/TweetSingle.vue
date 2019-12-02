@@ -122,7 +122,7 @@
     <div v-if="messageIsShared">
       <div  class="twi-left">
         <router-link :to="{ path: '/Zoom', query: { visitor_id: item.message_sender_user_id }}">
-          <Avatar style="width:40px;height:40px;border-radius:50%;" v-bind:src="item.userAvt"></Avatar>
+          <Avatar style="width:40px;height:40px;border-radius:50%;" v-bind:src="userAvt"></Avatar>
         </router-link>
       </div>
 
@@ -130,7 +130,7 @@
         <div class="twi-right-top-div">
           <div id="name-time-die"  style="float:left;">
             <router-link :to="{ path: '/Zoom', query: { visitor_id: item.message_sender_user_id }}">
-              <p class="user-name">{{item.userName}}</p>
+              <p class="user-name">{{userName}}</p>
               <p class="time">
                 {{item.message_create_time}}
                 <Icon type="ios-flame" size="18" style="color: #ff9900"></Icon>
@@ -138,7 +138,7 @@
               </p>
             </router-link>
           </div>
-          <div id="follow-mes-butt-div" style="float: right;">
+          <div v-if="myuserId != item.message_sender_user_id" id="follow-mes-butt-div" style="float: right;">
             <FollowButton
               @finish_update="send_update($event)"
               v-bind:isFollowing.sync="followByUser"
@@ -148,7 +148,7 @@
             <usermessage
               style="float:right;margin-right: 10px"
               v-bind:userId="item.message_sender_user_id"
-              v-if="myuserId != item.message_sender_user_id"
+            
             ></usermessage>
           </div>
         </div>
@@ -262,7 +262,7 @@
               </p>
             </router-link>
           </div>
-          <div id="follow-mes-butt-div" style="float: right;">
+          <div v-if="item.message_sender_user_id != myuserId" id="follow-mes-butt-div" style="float: right;">
             <FollowButton
               @finish_update="send_update($event)"
               v-bind:isFollowing.sync="followByUser"
@@ -272,7 +272,6 @@
             <usermessage
               style="float:right;margin-right: 10px"
               v-bind:userId="item.message_sender_user_id"
-              v-if="item.message_sender_user_id == myuserId"
             ></usermessage>
           </div>
         </div>
@@ -526,6 +525,7 @@ export default {
     }
   },
   created() {
+    console.log("135", this.item);
     var _this = this;
     this.getCookies("userId").then(userId => {
       _this.myuserId = userId;
@@ -570,7 +570,7 @@ export default {
         //获取以上的数据，这里由于可能是第二次拿数据，因此i+twiCount才是当前要处理的推的索引
     this.getUserPublicInfo(this.item.message_sender_user_id).then(
       Response => {
-        console.log("601" , this.item ,Response);
+        console.log("601" , this.item, Response);
         this.userName = Response.data.data.nickname;
         this.userAvt = Response.data.data.avatar_url;
 
@@ -588,6 +588,7 @@ export default {
               this.item.rawItem.message_sender_user_id
             ).then(Response => {
               this.rawItemUserName = Response.data.data.nickname;
+              console.log("133", Response);
               this.rawItemUserAvt = Response.data.data.avatar_url;
               //console.log("转发的推特",this.item.rawItem);
             });

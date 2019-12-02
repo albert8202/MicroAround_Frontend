@@ -144,14 +144,18 @@ export default {
           this.spinShow = false;
         });
       } else if (this.type == "collection") {
-        this.queryCollections(this.info, this.items.length + 1, 10).then(
+        console.log("1259", this.info, this.items)
+        if(this.info){
+          this.queryCollections(this.info, this.items.length + 1, 10).then(
           Response => {
             this.$emit("stop_loading");
+            console.log("1234", Response)
             this.twiDatas = Response.data.data;
             this.generateData();
             this.spinShow = false;
           }
         );
+        }
       } else if (this.type == "userhome") {
         if (this.info) {
           this.queryMessagesOf(this.info, this.items.length + 1, 10).then(
@@ -204,9 +208,10 @@ export default {
       //对twidatas根据时间排序
       console.log('看来吉安弗兰',this.twiDatas)
       this.twiDatas.sort(this.rule("message_create_time"));
-      console.log(this.twiDatas)
+      //console.log(this.twiDatas)
       //取得当前保存的推特总数
       let twiCount = this.items.length;
+      console.log("1235", twiCount);
       for (let i = 0; i < this.twiDatas.length; i++) {
         //还有一些属性需要自己去获取，包括是否被....以及用户的....
         let itemTemp = this.twiDatas[i];
