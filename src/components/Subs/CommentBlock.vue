@@ -83,7 +83,7 @@
             <Input :rows="1" :maxlength="140" style="width: 60%;margin-left:10%;margin-right:8%;"  v-model="commTextToSend" type="textarea" placeholder="Enter something..."/>
             <Button type="primary" @click="sendComment()" style="background-color: white ;color: black; z-index:10;">Send</Button>
         </div>
-        <div v-for="comm in comments">
+        <div v-for="comm in comments" v-bind:key="comm.comment.comment_create_time">
             <div class="comm-avt-div">
                 <Avatar v-bind:src="comm.userPublicInfo.avatar_url" class="comm-useravt"></Avatar>
             </div>

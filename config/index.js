@@ -38,7 +38,7 @@ module.exports = {
         target : 'http://localhost:8008',
         changeOrigin: true,
         pathRewrite:{
-          '^/avatars' : '/avatars'
+          '^/upload' : '/upload'
         }
       }
     },

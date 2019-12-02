@@ -613,6 +613,7 @@ Vue.prototype.queryForMe = function (startFrom, limitation) {
     limitation: limitation
   }
   return post(PRIVATE_LETTER + "queryForMe", data).then(res => {
+    console.log("测试私信")
     var letter_infos = res.data.data
     var result = createResData(res.data)
     var letters = new Array()
@@ -630,7 +631,10 @@ Vue.prototype.sendPrivateLetter = function (user_id, content) {
   if (!checkNumber(user_id) || !checkString(content)) {
     return null;
   }
-  return post(PRIVATE_LETTER + "send/" + user_id + "?content=" + content);
+  var data = {
+    content
+  }
+  return post(PRIVATE_LETTER + "send/" + user_id, data);
 }
 //deletePrivateLetter(private_letter_id)
 Vue.prototype.deletePrivateLetter = function (private_letter_id) {
@@ -877,7 +881,7 @@ Vue.prototype.queryComment = function (id, data) {
       //res.data.data=tmp;
     }
     //console.log("224", res);
-  
+
     return Promise.resolve(res)
   });
 }

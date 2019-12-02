@@ -202,7 +202,8 @@ export default {
     })
   },
   mounted() {
-    this.queryLatestContact(1, 10).then(response => {
+    this.queryLatestContact(1, 5).then(response => {
+      console.log("查询最近的私信")
       console.log(response);
       this.contactList = response.data.data;
     });

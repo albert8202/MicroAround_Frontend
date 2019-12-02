@@ -26,7 +26,7 @@
 }
 .center-fix{
 	position: fixed;/*固定位置*/
-	z-index:99;/*设置优先级显示，保证不会被覆盖*/	
+	z-index:99;/*设置优先级显示，保证不会被覆盖*/
   margin:auto;
 left:0;
 right:0;
@@ -141,7 +141,7 @@ bottom:0;
                     v-model="formValidate.alias"
                     placeholder="Enter your alias"
                     style="width: 400px;object-position: 100px"
-                    maxlength="10"
+                    :maxlength="10"
                   ></Input>
                 </FormItem>
 
@@ -511,7 +511,7 @@ export default {
     },
     handleBeforeUpload(file) {
       const check = this.uploadList.length < 1;
-      
+
       let _this = this;
       let reader = new FileReader();
       reader.readAsDataURL(file); // 这里是最关键的一步，转换就在这里

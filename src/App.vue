@@ -196,7 +196,7 @@ export default {
       try {
         //console.log("艾特");
         this.queryUnreadAt().then(response => {
-          //console.log("艾特數量", response)
+          //console.log("艾特數量", response.data)
           if (response.data.code == 200 && response.data.message == "success") {
             //console.log("設置mentionedCount")
             this.mentionedCount = response.data.data;
