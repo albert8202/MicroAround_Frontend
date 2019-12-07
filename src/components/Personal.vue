@@ -448,7 +448,7 @@ export default {
 
               let params = new FormData(); //创建一个form对象
 
-              params.append("file", x, x.name); //append 向form表单添加数据
+              params.append("avatar", x, x.name); //append 向form表单添加数据
               params.append("user_id", this.user_id);
 
               //添加请求头 通过form添加的图片和文件的格式必须是multipart/form-data

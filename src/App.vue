@@ -180,7 +180,7 @@ export default {
             return;
           } else {
             this.$Notice.error({
-              title: "Can't connect with server.",
+              title: "Failed.",
               desc: ""
             });
           }
@@ -188,7 +188,7 @@ export default {
       } catch (e) {
         return {
           result: false,
-          errMsg: "Can't connect with server"
+          errMsg: "Failed"
         };
       }
     },

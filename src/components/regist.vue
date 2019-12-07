@@ -157,10 +157,10 @@ created() {
           else{
             this.loading=false
             this.$Notice.error({
-              title: "Can't connect with server.",
+              title: "Failed.",
               desc:''
             })
-            this.errHint="Can't connect with server."
+            this.errHint="Failed."
           }
         });
       } catch (e) {
