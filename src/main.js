@@ -167,8 +167,6 @@ function transformMessage(res_data) {
   if(!res_data){
     return null;
   }
-  console.log("data content", res_data.messageContent);
-  console.log("data", res_data);
   var data = new Object();
   data.message_id = res_data.messageId
   data.message_content = res_data.messageContent
@@ -794,7 +792,6 @@ Vue.prototype.queryCollections = function (user_id, startFrom, limitation) {
     startFrom: startFrom,
     limitation: limitation
   }
-  console.log("查看收藏：：：：" + COLLECTION + "query/" + user_id)
   return post(COLLECTION + "queryCollection/" + user_id, data).then(res => {
     var message_infos = res.data.data
     var result = createResData(res.data)
@@ -804,7 +801,6 @@ Vue.prototype.queryCollections = function (user_id, startFrom, limitation) {
     }
     result.data = messages
     res.data = result
-    console.log("1230", res);
     return Promise.resolve(res)
   });
 }

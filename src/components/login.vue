@@ -102,7 +102,7 @@ export default {
             console.log(document.cookie)
             _this.$router.push("/home");
           }
-          else if(Response.data.code==200 && Response.data.data.user_id==0)
+          else if(Response.data.code==500 && Response.data.data.user_id==null)
           {
             //失败
             _this.loading=false

@@ -144,7 +144,7 @@ created() {
             this.loading=false 
             this.$router.push("/login");
           }
-          else if(Response.data.code==200 && Response.data.message=="The email is used")
+          else if(Response.data.code==500)
           {
             //邮箱已被使用
             this.loading=false

@@ -33,7 +33,7 @@
 
 <template>
   <div style="width:100%">
-    <div  v-for="item in items" v-bind:key="item.message_id">
+    <div v-for="item in items" v-bind:key="item.message_id">
       <twiitem
         v-bind:item="item"
         class="tweet-items"
@@ -43,10 +43,15 @@
         v-bind:isFollowing="isFollowing[item.message_sender_user_id]"
         @change_follow="change_follow($event,item)"
       ></twiitem>
-      <Divider/>
+      <Divider />
     </div>
-    <div v-if="ableShowMore" class="load-more" @click="loadMore()">Load More...<spin v-if="spinShow"><Icon type="ios-loading" size=18 class="demo-spin-icon-load"></Icon>
-                <div>Loading</div></spin></div>
+    <div v-if="ableShowMore" class="load-more" @click="loadMore()">
+      Load More...
+      <spin v-if="spinShow">
+        <Icon type="ios-loading" size="18" class="demo-spin-icon-load"></Icon>
+        <div>Loading</div>
+      </spin>
+    </div>
     <div v-else class="no-more">No More</div>
   </div>
 </template>
@@ -72,7 +77,8 @@ export default {
       ableShowMore: true,
       isFollowing: new Object(),
       spinShow: false,
-      burl: "http://localhost:8008/"
+      burl: "http://localhost:8008/",
+      timer:null
     };
   },
   methods: {
@@ -105,10 +111,7 @@ export default {
     downloadData() {
       this.spinShow = true;
       if (this.type == "explore") {
-        this.queryNewestMessage(
-          this.items.length + 1,
-          10
-        ).then(Response => {
+        this.queryNewestMessage(this.items.length + 1, 10).then(Response => {
           console.log("159", Response);
           this.$emit("stop_loading");
           this.twiDatas = Response.data.data;
@@ -131,30 +134,27 @@ export default {
           );
         }
       } else if (this.type == "home") {
-        this.queryFollowMessage(
-          this.items.length + 1,
-          10
-        ).then(Response => {
+        this.queryFollowMessage(this.items.length + 1, 10).then(Response => {
           console.log("423");
           console.log(Response);
           this.$emit("stop_loading");
-          console.log("結束獲取")
+          console.log("結束獲取");
           this.twiDatas = Response.data.data;
           this.generateData();
           this.spinShow = false;
         });
       } else if (this.type == "collection") {
-        console.log("1259", this.info, this.items)
-        if(this.info){
+        console.log("1259", this.info, this.items);
+        if (this.info) {
           this.queryCollections(this.info, this.items.length + 1, 10).then(
-          Response => {
-            this.$emit("stop_loading");
-            console.log("1234", Response)
-            this.twiDatas = Response.data.data;
-            this.generateData();
-            this.spinShow = false;
-          }
-        );
+            Response => {
+              this.$emit("stop_loading");
+              console.log("1234", Response);
+              this.twiDatas = Response.data.data;
+              this.generateData();
+              this.spinShow = false;
+            }
+          );
         }
       } else if (this.type == "userhome") {
         if (this.info) {
@@ -206,7 +206,7 @@ export default {
         return;
       }
       //对twidatas根据时间排序
-      console.log('看来吉安弗兰',this.twiDatas)
+      console.log("看来吉安弗兰", this.twiDatas);
       this.twiDatas.sort(this.rule("message_create_time"));
       //console.log(this.twiDatas)
       //取得当前保存的推特总数
@@ -232,8 +232,7 @@ export default {
         }
         //可以先解析已有内容
         this.isFollowing[itemTemp.message_sender_user_id] = null;
-            this.items.push(itemTemp);
-
+        this.items.push(itemTemp);
       }
       //完成加入后清空twiDatas，必须有，否则验证出错
       this.twiDatas = [];
@@ -243,17 +242,102 @@ export default {
       var k = JSON.parse(JSON.stringify(this.isFollowing));
       k[item.message_sender_user_id] = event;
       this.isFollowing = k;
-      console.log(this.isFollowing)
+      console.log(this.isFollowing);
       this.$emit("change_following", event, item.message_sender_user_id);
     },
     change_follow2(val, id) {
-      if (typeof(this.isFollowing[id])!="undefined") {
-          var k = JSON.parse(JSON.stringify(this.isFollowing));
-          k[id] = val;
-          this.isFollowing = k;
-          console.log(k)
-
+      if (typeof this.isFollowing[id] != "undefined") {
+        var k = JSON.parse(JSON.stringify(this.isFollowing));
+        k[id] = val;
+        this.isFollowing = k;
+        console.log(k);
       }
+    },
+    get_start_data() {
+      var Datas = [];
+      var tmp_func = Response => {
+        console.log("tmp_func")
+        Datas = Response.data.data;
+        return Promise.resolve(Datas);
+      };
+      if (this.type == "explore") {
+        return this.queryNewestMessage(1, 10).then(tmp_func);
+      } else if (this.type == "topic") {
+        //console.log("id", this.info);
+        if (this.info) {
+          return this.queryMessagesContains(this.info, 1, 10).then(
+            //this.queryFollowMessage(this.items.length + 1, 10).then(
+            tmp_func
+          );
+        }
+      } else if (this.type == "home") {
+        return this.queryFollowMessage(1, 10).then(Response => {
+          Datas = Response.data.data;
+        });
+      } else if (this.type == "collection") {
+        if (this.info) {
+          return this.queryCollections(this.info, 1, 10).then(tmp_func);
+        }
+      } else if (this.type == "userhome") {
+        if (this.info) {
+          return this.queryMessagesOf(this.info, 1, 10).then(tmp_func);
+        }
+      } else if (this.type == "search") {
+        if (this.info) {
+          return this.search(this.info, 1, 10).then(tmp_func);
+        }
+      } else if (this.type == "notification") {
+        return this.queryAtMe(1, 10).then(tmp_func);
+      }
+      return Promise.resolve(null)
+    },
+    check_update() {
+      console.log("check_update")
+      this.get_start_data().then(Data => {
+        if (!Data || Data.length == 0) {
+          return;
+        }
+        Data.sort(this.rule("message_create_time"));
+        var new_time=""
+        if(this.items.length!=0){
+          new_time=this.items[0].message_create_time
+        }
+        var tmp_l=0;
+        for (let i = Data.length-1; i >=0 ; i--) {
+          //还有一些属性需要自己去获取，包括是否被....以及用户的....
+          let itemTemp = Data[i];
+          if(itemTemp.message_create_time<=new_time){
+            continue
+          }else{
+            if(tmp_l==0){
+              tmp_l=i+1
+            }
+          }
+          itemTemp.ifShowComment = false;
+          itemTemp.comments = [];
+          itemTemp.collectByUser = false;
+          itemTemp.likeByUser = false;
+          itemTemp.followByUser = null;
+          itemTemp.comments = [];
+          if (itemTemp.message_ats == null) {
+            itemTemp.message_ats = [];
+          }
+          if (itemTemp.message_topics == null) {
+            itemTemp.message_topics = [];
+          }
+          if (itemTemp.message_image_urls == null) {
+            itemTemp.message_image_urls = [];
+          }
+          //可以先解析已有内容
+          this.isFollowing[itemTemp.message_sender_user_id] = null;
+          
+        }
+        if(tmp_l==0){
+          return
+        }else{
+          this.items=Data.slice(0,tmp_l).concat(this.items)
+        }
+      });
     }
   },
   created() {
@@ -271,6 +355,8 @@ export default {
     if (array.length < 10) {
       //this.ableShowMore = false
     }
+    console.log("Set Interval")
+    this.timer=setInterval(this.check_update,10000)
   },
   watch: {
     info: function(nval, oval) {
@@ -280,5 +366,8 @@ export default {
   components: {
     twiitem: TwiItem
   },
+  beforeDestroy(){
+    clearInterval(this.timer)
+  }
 };
 </script>
