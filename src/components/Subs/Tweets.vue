@@ -271,9 +271,7 @@ export default {
           );
         }
       } else if (this.type == "home") {
-        return this.queryFollowMessage(1, 10).then(Response => {
-          Datas = Response.data.data;
-        });
+        return this.queryFollowMessage(1, 10).then(tmp_func);
       } else if (this.type == "collection") {
         if (this.info) {
           return this.queryCollections(this.info, 1, 10).then(tmp_func);
